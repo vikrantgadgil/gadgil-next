@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(node -e \"const na = require\\('next-auth'\\); console.log\\(Object.keys\\(na\\)\\)\")",
+      "Bash(node -e \"const d=require\\('/dev/stdin'\\);console.log\\('version:',d.version\\);console.log\\('main:',d.main\\);console.log\\('exports keys:',Object.keys\\(d.exports||{}\\).slice\\(0,15\\)\\)\")",
+      "Bash(node -p \"require\\('./node_modules/next-auth/package.json'\\).version\")",
+      "Bash(node -p \"JSON.stringify\\(Object.keys\\(require\\('./node_modules/next-auth/package.json'\\).exports||{}\\).slice\\(0,20\\)\\)\")",
+      "Bash(npm install:*)",
+      "Bash(node -p \"JSON.stringify\\(Object.keys\\(require\\('./node_modules/@auth/drizzle-adapter/package.json'\\).exports||{}\\),null,2\\)\")",
+      "Bash(node -p \"JSON.stringify\\(Object.keys\\(require\\('./node_modules/next-auth/adapters'\\)\\)\\)\")"
+    ]
+  }
+}
