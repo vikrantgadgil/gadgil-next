@@ -84,6 +84,14 @@ export type Account = {
   returnRate: number;
 };
 
+export type IncomeStream = {
+  id: string;
+  name: string;
+  annualAmount: number;
+  startAge: number;
+  endAge: number | "";
+};
+
 export type RetirementInputs = {
   selfAge: number;
   spouseAge: number;
@@ -95,6 +103,7 @@ export type RetirementInputs = {
   ssSelf: number;
   ssAgeSpouse: number | "";
   ssSpouse: number;
+  incomeStreams: IncomeStream[];
 };
 
 export const retirementScenarios = pgTable("retirement_scenario", {

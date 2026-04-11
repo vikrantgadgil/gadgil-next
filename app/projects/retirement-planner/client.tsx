@@ -29,7 +29,7 @@ import {
   Trash2,
   Plus,
 } from "lucide-react";
-import type { Account, AccountType, RetirementInputs } from "@/lib/db/schema";
+import type { Account, AccountType, IncomeStream, RetirementInputs } from "@/lib/db/schema";
 import { ACCOUNT_TYPE_LABELS } from "@/lib/db/schema";
 
 // ---------------------------------------------------------------------------
@@ -60,6 +60,7 @@ type ProjectionRow = {
   growth: number;
   spending: number;
   socialSecurity: number;
+  otherIncome: number;
   endBalance: number;
 };
 
@@ -81,6 +82,16 @@ function newAccount(): Account {
     type: "taxable",
     balance: 0,
     returnRate: 5.0,
+  };
+}
+
+function newIncomeStream(): IncomeStream {
+  return {
+    id: crypto.randomUUID(),
+    name: "",
+    annualAmount: 0,
+    startAge: 0,
+    endAge: "",
   };
 }
 
@@ -129,6 +140,23 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
     );
   }
 
+  // ── Income stream state & helpers ────────────────────────────────────────
+  const [incomeStreams, setIncomeStreams] = useState<IncomeStream[]>([]);
+
+  function addIncomeStream() {
+    setIncomeStreams((prev) => [...prev, newIncomeStream()]);
+  }
+
+  function removeIncomeStream(id: string) {
+    setIncomeStreams((prev) => prev.filter((s) => s.id !== id));
+  }
+
+  function updateIncomeStream(id: string, patch: Partial<Omit<IncomeStream, "id">>) {
+    setIncomeStreams((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, ...patch } : s))
+    );
+  }
+
   // ── Save / load state ───────────────────────────────────────────────────
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [scenarioName, setScenarioName] = useState("");
@@ -157,6 +185,7 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
       ssSelf,
       ssAgeSpouse,
       ssSpouse,
+      incomeStreams,
     };
   }
 
@@ -195,6 +224,7 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
       setSsSelf(inp.ssSelf);
       setSsAgeSpouse(inp.ssAgeSpouse);
       setSsSpouse(inp.ssSpouse);
+      setIncomeStreams(inp.incomeStreams ?? []);
     } finally {
       setLoadingId(null);
     }
@@ -252,13 +282,21 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
       if (ssAgeSelf !== "" && currentSelfAge >= ssAgeSelf) socialSecurity += ssSelf;
       if (ssAgeSpouse !== "" && currentSpouseAge >= ssAgeSpouse) socialSecurity += ssSpouse;
 
+      // Sum income streams active this year (keyed off selfAge).
+      const otherIncome = incomeStreams.reduce((sum, s) => {
+        const active =
+          currentSelfAge >= s.startAge &&
+          (s.endAge === "" || currentSelfAge <= s.endAge);
+        return active ? sum + s.annualAmount : sum;
+      }, 0);
+
       // Balances after growth.
       const afterGrowth = balances.map((b, idx) => b + growths[idx]);
       const totalAfterGrowth = afterGrowth.reduce((s, b) => s + b, 0);
 
       // Net cash flow into the portfolio this year.
-      // Negative = withdrawal needed; positive = SS surplus reinvested.
-      const netCashFlow = socialSecurity - spending;
+      // Negative = withdrawal needed; positive = income surplus reinvested.
+      const netCashFlow = socialSecurity + otherIncome - spending;
 
       if (totalAfterGrowth > 0) {
         // Distribute proportionally so each account's share is preserved.
@@ -278,6 +316,7 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
         growth: totalGrowth,
         spending,
         socialSecurity,
+        otherIncome,
         endBalance,
       });
     }
@@ -285,7 +324,7 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
     return projection;
   }, [
     accounts, selfAge, spouseAge, annualSpending, inflationRate,
-    longevityAge, ssAgeSelf, ssSelf, ssAgeSpouse, ssSpouse,
+    longevityAge, ssAgeSelf, ssSelf, ssAgeSpouse, ssSpouse, incomeStreams,
   ]);
 
   const finalRow = rows[rows.length - 1];
@@ -638,6 +677,97 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
                 </div>
               </CardContent>
             </Card>
+            {/* Income Streams */}
+            <Card className="rounded-3xl shadow-sm">
+              <CardHeader>
+                <CardTitle>Income Streams</CardTitle>
+                <CardDescription>
+                  Pension, rental income, part-time work, annuities, etc.
+                  Amounts are nominal (not inflation-adjusted). Ages reference your age.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {incomeStreams.length === 0 ? (
+                  <p className="text-sm text-slate-400">No income streams added.</p>
+                ) : (
+                  <>
+                    {/* Column headers */}
+                    <div className="grid grid-cols-[1fr_88px_72px_72px_32px] items-center gap-2 px-1">
+                      <span className="text-xs font-medium text-slate-500">Name</span>
+                      <span className="text-xs font-medium text-slate-500">Annual ($)</span>
+                      <span className="text-xs font-medium text-slate-500">Start age</span>
+                      <span className="text-xs font-medium text-slate-500">End age</span>
+                      <span />
+                    </div>
+
+                    {/* Stream rows */}
+                    <div className="space-y-2">
+                      {incomeStreams.map((stream) => (
+                        <div
+                          key={stream.id}
+                          className="grid grid-cols-[1fr_88px_72px_72px_32px] items-center gap-2"
+                        >
+                          <Input
+                            value={stream.name}
+                            placeholder="e.g. Pension"
+                            onChange={(e) =>
+                              updateIncomeStream(stream.id, { name: e.target.value })
+                            }
+                            className="h-8 text-sm"
+                          />
+                          <Input
+                            type="number"
+                            value={stream.annualAmount}
+                            onChange={(e) =>
+                              updateIncomeStream(stream.id, {
+                                annualAmount: Number(e.target.value || 0),
+                              })
+                            }
+                            className="h-8 text-sm"
+                          />
+                          <Input
+                            type="number"
+                            value={stream.startAge}
+                            onChange={(e) =>
+                              updateIncomeStream(stream.id, {
+                                startAge: Number(e.target.value || 0),
+                              })
+                            }
+                            className="h-8 text-sm"
+                          />
+                          <Input
+                            type="number"
+                            placeholder="∞"
+                            value={stream.endAge === "" ? "" : stream.endAge}
+                            onChange={(e) =>
+                              updateIncomeStream(stream.id, {
+                                endAge: e.target.value === "" ? "" : Number(e.target.value),
+                              })
+                            }
+                            className="h-8 text-sm"
+                          />
+                          <button
+                            onClick={() => removeIncomeStream(stream.id)}
+                            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+                            aria-label="Remove income stream"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                <button
+                  onClick={addIncomeStream}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-slate-300 px-3 py-1.5 text-xs text-slate-500 hover:border-slate-400 hover:text-slate-700 transition-colors"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Add stream
+                </button>
+              </CardContent>
+            </Card>
           </div>
 
           {/* ── Results column ── */}
@@ -778,6 +908,7 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
                         <TableHead>Growth</TableHead>
                         <TableHead>Spending</TableHead>
                         <TableHead>Social Security</TableHead>
+                        <TableHead>Other Income</TableHead>
                         <TableHead>End Balance</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -791,6 +922,7 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
                           <TableCell>{currency(row.growth)}</TableCell>
                           <TableCell>{currency(row.spending)}</TableCell>
                           <TableCell>{currency(row.socialSecurity)}</TableCell>
+                          <TableCell>{currency(row.otherIncome)}</TableCell>
                           <TableCell
                             className={
                               row.endBalance < 0
