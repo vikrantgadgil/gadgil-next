@@ -67,13 +67,29 @@ export const verificationTokens = pgTable(
 // App-specific tables
 // ---------------------------------------------------------------------------
 
+export type AccountType = "traditional" | "roth" | "taxable" | "cash";
+
+export const ACCOUNT_TYPE_LABELS: Record<AccountType, string> = {
+  traditional: "Traditional 401k/IRA",
+  roth: "Roth 401k/IRA",
+  taxable: "Taxable Brokerage",
+  cash: "Cash / Other",
+};
+
+export type Account = {
+  id: string;
+  name: string;
+  type: AccountType;
+  balance: number;
+  returnRate: number;
+};
+
 export type RetirementInputs = {
   selfAge: number;
   spouseAge: number;
-  portfolio: number;
+  accounts: Account[];
   annualSpending: number;
   inflationRate: number;
-  returnRate: number;
   longevityAge: number;
   ssAgeSelf: number | "";
   ssSelf: number;

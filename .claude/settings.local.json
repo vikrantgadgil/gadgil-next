@@ -8,7 +8,8 @@
       "Bash(node -p \"JSON.stringify\\(Object.keys\\(require\\('./node_modules/next-auth/package.json'\\).exports||{}\\).slice\\(0,20\\)\\)\")",
       "Bash(npm install:*)",
       "Bash(node -p \"JSON.stringify\\(Object.keys\\(require\\('./node_modules/@auth/drizzle-adapter/package.json'\\).exports||{}\\),null,2\\)\")",
-      "Bash(node -p \"JSON.stringify\\(Object.keys\\(require\\('./node_modules/next-auth/adapters'\\)\\)\\)\")"
+      "Bash(node -p \"JSON.stringify\\(Object.keys\\(require\\('./node_modules/next-auth/adapters'\\)\\)\\)\")",
+      "Bash(node -e ':*)"
     ]
   }
 }
