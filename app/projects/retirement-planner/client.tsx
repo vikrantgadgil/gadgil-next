@@ -482,16 +482,20 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
       const federalTax = ltcgTax + taxOnExternalIncome + taxOnTraditionalWithdrawals;
 
       // Calculate end balance using cash-flow formula: Start + Growth + Income - Spending - Tax
-      const portfolioAfterWithdrawals = afterGrowth.reduce((s, b) => s + b, 0);
       const endBalance = startBalance + totalGrowth + socialSecurity + otherIncome - spending - federalTax;
 
       // Update account balances for next year
-      // Distribute the tax payment proportionally across accounts based on their share
-      if (portfolioAfterWithdrawals > 0) {
-        const totalTaxPaid = federalTax;
-        balances = afterGrowth.map((b) => b - totalTaxPaid * (b / portfolioAfterWithdrawals));
+      // Scale accounts proportionally so sum equals endBalance exactly (avoids rounding drift)
+      const portfolioBeforeTax = afterGrowth.reduce((s, b) => s + b, 0);
+      if (portfolioBeforeTax > 0 && endBalance > 0) {
+        const scaleFactor = endBalance / portfolioBeforeTax;
+        balances = afterGrowth.map((b) => b * scaleFactor);
+      } else if (endBalance > 0) {
+        // Portfolio depleted but still have cash; distribute endBalance equally
+        balances = accounts.map(() => endBalance / accounts.length);
       } else {
-        balances = afterGrowth;
+        // Negative balance; scale down the depleted accounts
+        balances = afterGrowth.map((b) => Math.max(0, b * (endBalance / portfolioBeforeTax)));
       }
 
       projection.push({
