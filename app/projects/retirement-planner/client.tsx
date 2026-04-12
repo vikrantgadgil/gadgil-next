@@ -61,6 +61,8 @@ type ProjectionRow = {
   spending: number;
   socialSecurity: number;
   otherIncome: number;
+  federalTax: number;
+  grossWithdrawal: number;
   endBalance: number;
 };
 
@@ -95,6 +97,101 @@ function newIncomeStream(): IncomeStream {
   };
 }
 
+// ──────────────────────────────────────────────────────────────────────────
+// Tax helper functions
+// ──────────────────────────────────────────────────────────────────────────
+
+function getTaxBrackets(filingStatus: "single" | "mfj"): [number, number][] {
+  if (filingStatus === "single") {
+    return [
+      [11600, 0.10],
+      [47150, 0.12],
+      [100525, 0.22],
+      [191950, 0.24],
+      [243725, 0.32],
+      [609350, 0.35],
+      [Infinity, 0.37],
+    ];
+  } else {
+    return [
+      [23200, 0.10],
+      [94300, 0.12],
+      [201050, 0.22],
+      [383900, 0.24],
+      [487450, 0.32],
+      [731200, 0.35],
+      [Infinity, 0.37],
+    ];
+  }
+}
+
+function calculateOrdinaryTax(ordinaryIncome: number, filingStatus: "single" | "mfj"): number {
+  if (ordinaryIncome <= 0) return 0;
+
+  const brackets = getTaxBrackets(filingStatus);
+  let tax = 0;
+  let prevLimit = 0;
+
+  for (const [limit, rate] of brackets) {
+    if (ordinaryIncome <= prevLimit) break;
+    const taxableInBracket = Math.min(ordinaryIncome, limit) - prevLimit;
+    tax += taxableInBracket * rate;
+    prevLimit = limit;
+  }
+
+  return tax;
+}
+
+function calculateSSTax(ssIncome: number, otherIncome: number, filingStatus: "single" | "mfj"): { taxableAmount: number; tax: number } {
+  const threshold = filingStatus === "single" ? 34000 : 44000;
+  const combinedIncome = otherIncome + ssIncome + (0.5 * ssIncome);
+
+  if (combinedIncome <= threshold) {
+    return { taxableAmount: 0, tax: 0 };
+  }
+
+  const taxableAmount = Math.min(0.85 * ssIncome, 0.5 * (combinedIncome - threshold));
+  return { taxableAmount, tax: 0 }; // Tax will be calculated as part of ordinary income
+}
+
+function calculateLTCGTax(gains: number): number {
+  return gains * 0.15;
+}
+
+function calculateRMD(age: number, balance: number): number {
+  if (age < 73) return 0;
+  const divisor = 27.4 - (age - 73) * 0.4;
+  return Math.max(0, balance / divisor);
+}
+
+function calculateGrossUpWithdrawal(netNeeded: number, ordinaryIncomeSoFar: number, filingStatus: "single" | "mfj"): number {
+  if (netNeeded <= 0) return 0;
+
+  // Initial guess
+  let grossWithdrawal = netNeeded / 0.76; // Assume ~24% marginal rate initially
+
+  for (let i = 0; i < 5; i++) {
+    const totalOrdinary = ordinaryIncomeSoFar + grossWithdrawal;
+    const taxOnTotal = calculateOrdinaryTax(totalOrdinary, filingStatus);
+    const taxOnCurrent = calculateOrdinaryTax(ordinaryIncomeSoFar, filingStatus);
+    const taxOnGross = taxOnTotal - taxOnCurrent;
+    const netFromGross = grossWithdrawal - taxOnGross;
+
+    if (Math.abs(netFromGross - netNeeded) < 1) {
+      return grossWithdrawal;
+    }
+
+    // Adjust: if we're getting more net than needed, reduce gross
+    if (netFromGross > netNeeded) {
+      grossWithdrawal *= netNeeded / netFromGross;
+    } else {
+      grossWithdrawal *= netNeeded / netFromGross;
+    }
+  }
+
+  return grossWithdrawal;
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -121,6 +218,7 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
   const [ssSelf, setSsSelf] = useState(20000);
   const [ssAgeSpouse, setSsAgeSpouse] = useState<number | "">("");
   const [ssSpouse, setSsSpouse] = useState(20000);
+  const [filingStatus, setFilingStatus] = useState<"single" | "mfj">("single");
 
   // ── Account helpers ─────────────────────────────────────────────────────
   function addAccount() {
@@ -186,6 +284,7 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
       ssAgeSpouse,
       ssSpouse,
       incomeStreams,
+      filingStatus,
     };
   }
 
@@ -225,6 +324,7 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
       setSsAgeSpouse(inp.ssAgeSpouse);
       setSsSpouse(inp.ssSpouse);
       setIncomeStreams(inp.incomeStreams ?? []);
+      setFilingStatus(inp.filingStatus ?? "single");
     } finally {
       setLoadingId(null);
     }
@@ -256,9 +356,8 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
   );
 
   // ── Projection ──────────────────────────────────────────────────────────
-  // Each account is tracked individually so its own return rate applies.
-  // Spending withdrawals are deducted proportionally across accounts by
-  // their share of total balance each year.
+  // Implements withdrawal sequencing: Taxable → Traditional (with gross-up) → Roth
+  // Applies federal tax calculations including SS taxation and LTCG.
   const rows = useMemo(() => {
     const projection: ProjectionRow[] = [];
     const years = Math.max(0, longevityAge - Math.min(selfAge, spouseAge) + 1);
@@ -292,21 +391,108 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
 
       // Balances after growth.
       const afterGrowth = balances.map((b, idx) => b + growths[idx]);
-      const totalAfterGrowth = afterGrowth.reduce((s, b) => s + b, 0);
 
-      // Net cash flow into the portfolio this year.
-      // Negative = withdrawal needed; positive = income surplus reinvested.
-      const netCashFlow = socialSecurity + otherIncome - spending;
+      // ── Withdrawal sequencing & tax calculation ────────────────────────
+      let ltcgTax = 0;          // LTCG tax on Taxable withdrawals (subtracted from endBalance)
+      let traditionalTax = 0;   // Tax on Traditional withdrawals (embedded in gross-up, not subtracted)
+      let grossWithdrawal = 0;
+      let ordinaryTaxableIncome = 0;
+      let totalNeeded = Math.max(0, spending - socialSecurity - otherIncome);
 
-      if (totalAfterGrowth > 0) {
-        // Distribute proportionally so each account's share is preserved.
-        balances = afterGrowth.map((b) => b + netCashFlow * (b / totalAfterGrowth));
-      } else {
-        // Portfolio fully depleted; accumulate deficit in first account.
-        balances = afterGrowth.map((b, idx) => (idx === 0 ? b + netCashFlow : b));
+      if (totalNeeded > 0) {
+        // Step 1: Withdraw from Taxable accounts (LTCG tax is SEPARATE outflow)
+        const taxableIndices = accounts.map((a, idx) => (a.type === "taxable" ? idx : -1)).filter(idx => idx >= 0);
+        for (const idx of taxableIndices) {
+          if (totalNeeded <= 0) break;
+          const taxableWithdrawal = Math.min(totalNeeded, afterGrowth[idx]);
+          afterGrowth[idx] -= taxableWithdrawal;
+          grossWithdrawal += taxableWithdrawal;
+
+          // LTCG tax is a separate outflow from the portfolio
+          const gains = taxableWithdrawal * 0.5;
+          ltcgTax += calculateLTCGTax(gains);
+          totalNeeded -= taxableWithdrawal;
+        }
+
+        // Step 2: Withdraw from Traditional accounts (tax embedded in gross-up)
+        if (totalNeeded > 0) {
+          const traditionalIndices = accounts.map((a, idx) => (a.type === "traditional" ? idx : -1)).filter(idx => idx >= 0);
+          const totalTraditionalBalance = traditionalIndices.reduce((sum, idx) => sum + afterGrowth[idx], 0);
+
+          if (totalTraditionalBalance > 0) {
+            const ssTaxInfo = calculateSSTax(socialSecurity, otherIncome, filingStatus);
+            const ordinaryIncomeSoFar = otherIncome + ssTaxInfo.taxableAmount;
+
+            const traditionalGross = calculateGrossUpWithdrawal(totalNeeded, ordinaryIncomeSoFar, filingStatus);
+            const availableTraditional = totalTraditionalBalance;
+
+            if (traditionalGross <= availableTraditional) {
+              for (const idx of traditionalIndices) {
+                const share = afterGrowth[idx] / totalTraditionalBalance;
+                const amountFromThisAccount = traditionalGross * share;
+                afterGrowth[idx] -= amountFromThisAccount;
+              }
+              ordinaryTaxableIncome += traditionalGross;
+              grossWithdrawal += traditionalGross;
+
+              // Calculate the embedded tax (for reporting, not portfolio subtraction)
+              const taxWithTraditional = calculateOrdinaryTax(ordinaryIncomeSoFar + traditionalGross, filingStatus);
+              const taxWithoutTraditional = calculateOrdinaryTax(ordinaryIncomeSoFar, filingStatus);
+              traditionalTax = taxWithTraditional - taxWithoutTraditional;
+
+              totalNeeded = 0;
+            } else {
+              for (const idx of traditionalIndices) {
+                ordinaryTaxableIncome += afterGrowth[idx];
+                grossWithdrawal += afterGrowth[idx];
+                afterGrowth[idx] = 0;
+              }
+              totalNeeded -= availableTraditional;
+            }
+          }
+        }
+
+        // Step 3: Withdraw from Roth accounts (tax-free)
+        if (totalNeeded > 0) {
+          const rothIndices = accounts.map((a, idx) => (a.type === "roth" ? idx : -1)).filter(idx => idx >= 0);
+          for (const idx of rothIndices) {
+            if (totalNeeded <= 0) break;
+            const rothWithdrawal = Math.min(totalNeeded, afterGrowth[idx]);
+            afterGrowth[idx] -= rothWithdrawal;
+            grossWithdrawal += rothWithdrawal;
+            totalNeeded -= rothWithdrawal;
+          }
+        }
       }
 
-      const endBalance = balances.reduce((s, b) => s + b, 0);
+      // Calculate tax on external income (SS + Other Income)
+      // This is always a portfolio outflow, even if no withdrawals are needed
+      const ssTaxInfo = calculateSSTax(socialSecurity, otherIncome, filingStatus);
+      const taxOnExternalIncome = calculateOrdinaryTax(otherIncome + ssTaxInfo.taxableAmount, filingStatus);
+
+      // Calculate tax on Traditional withdrawals (if any)
+      // This is embedded in the gross-up, not separately subtracted
+      let taxOnTraditionalWithdrawals = 0;
+      if (ordinaryTaxableIncome > 0) {
+        const taxWithTraditional = calculateOrdinaryTax(ordinaryTaxableIncome + otherIncome + ssTaxInfo.taxableAmount, filingStatus);
+        taxOnTraditionalWithdrawals = taxWithTraditional - taxOnExternalIncome;
+      }
+
+      // Federal tax for display = all taxes owed (LTCG + external income + embedded Traditional)
+      const federalTax = ltcgTax + taxOnExternalIncome + taxOnTraditionalWithdrawals;
+
+      // Calculate end balance using cash-flow formula: Start + Growth + Income - Spending - Tax
+      const portfolioAfterWithdrawals = afterGrowth.reduce((s, b) => s + b, 0);
+      const endBalance = startBalance + totalGrowth + socialSecurity + otherIncome - spending - federalTax;
+
+      // Update account balances for next year
+      // Distribute the tax payment proportionally across accounts based on their share
+      if (portfolioAfterWithdrawals > 0) {
+        const totalTaxPaid = federalTax;
+        balances = afterGrowth.map((b) => b - totalTaxPaid * (b / portfolioAfterWithdrawals));
+      } else {
+        balances = afterGrowth;
+      }
 
       projection.push({
         year: i + 1,
@@ -317,6 +503,8 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
         spending,
         socialSecurity,
         otherIncome,
+        federalTax,
+        grossWithdrawal,
         endBalance,
       });
     }
@@ -324,7 +512,7 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
     return projection;
   }, [
     accounts, selfAge, spouseAge, annualSpending, inflationRate,
-    longevityAge, ssAgeSelf, ssSelf, ssAgeSpouse, ssSpouse, incomeStreams,
+    longevityAge, ssAgeSelf, ssSelf, ssAgeSpouse, ssSpouse, incomeStreams, filingStatus,
   ]);
 
   const finalRow = rows[rows.length - 1];
@@ -456,6 +644,18 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
                       onChange={(e) => setSpouseAge(Number(e.target.value || 0))}
                     />
                   </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="filingStatus">Tax filing status</Label>
+                  <select
+                    id="filingStatus"
+                    value={filingStatus}
+                    onChange={(e) => setFilingStatus(e.target.value as "single" | "mfj")}
+                    className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-slate-700 focus:outline-none focus:ring-1 focus:ring-ring"
+                  >
+                    <option value="single">Single</option>
+                    <option value="mfj">Married Filing Jointly</option>
+                  </select>
                 </div>
               </CardContent>
             </Card>
@@ -892,8 +1092,7 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
               <CardHeader>
                 <CardTitle>Detailed Projection</CardTitle>
                 <CardDescription>
-                  Year-by-year view of growth, spending, Social Security, and
-                  balance
+                  Year-by-year view of growth, spending, Social Security, income, taxes, and balance
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -909,6 +1108,9 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
                         <TableHead>Spending</TableHead>
                         <TableHead>Social Security</TableHead>
                         <TableHead>Other Income</TableHead>
+                        <TableHead title="Traditional withdrawal taxes are embedded in the gross withdrawal. LTCG taxes are a separate portfolio outflow.">
+                          Est. Federal Tax
+                        </TableHead>
                         <TableHead>End Balance</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -923,6 +1125,7 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
                           <TableCell>{currency(row.spending)}</TableCell>
                           <TableCell>{currency(row.socialSecurity)}</TableCell>
                           <TableCell>{currency(row.otherIncome)}</TableCell>
+                          <TableCell>{currency(row.federalTax)}</TableCell>
                           <TableCell
                             className={
                               row.endBalance < 0

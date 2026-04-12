@@ -104,6 +104,7 @@ export type RetirementInputs = {
   ssAgeSpouse: number | "";
   ssSpouse: number;
   incomeStreams: IncomeStream[];
+  filingStatus: "single" | "mfj";
 };
 
 export const retirementScenarios = pgTable("retirement_scenario", {
