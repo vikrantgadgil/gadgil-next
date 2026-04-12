@@ -522,7 +522,7 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
   ]);
 
   const finalRow = rows[rows.length - 1];
-  const depletionRow = rows.find((r) => r.endBalance < 0);
+  const depletionRow = rows.find((r) => r.endBalance <= 0);
   const status = depletionRow
     ? "Runs out before longevity target"
     : "Lasts through target age";
@@ -1071,7 +1071,7 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
                         <div className="h-5 rounded-full bg-slate-100">
                           <div
                             className={`h-5 rounded-full ${
-                              row.endBalance < 0
+                              row.endBalance <= 0
                                 ? "bg-amber-500"
                                 : "bg-slate-900"
                             }`}
@@ -1080,7 +1080,7 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
                         </div>
                         <div
                           className={`text-right text-sm ${
-                            row.endBalance < 0
+                            row.endBalance <= 0
                               ? "font-medium text-amber-700"
                               : "text-slate-700"
                           }`}
@@ -1134,7 +1134,7 @@ export function RetirementPlannerClient({ userId }: { userId: string }) {
                           <TableCell>{currency(row.federalTax)}</TableCell>
                           <TableCell
                             className={
-                              row.endBalance < 0
+                              row.endBalance <= 0
                                 ? "font-semibold text-amber-700"
                                 : "font-medium"
                             }
