@@ -162,6 +162,8 @@ function WatchItHappen({
   const [speed, setSpeed] = useState<number>(1);
   const [anim, setAnim] = useState<Anim>(IDLE);
   const yearRef = useRef<DayResult[]>([]);
+  // Snapshot bankrollLimit at start() so the ruin screen always matches the simulation
+  const simLimitRef = useRef<number>(bankrollLimit);
 
   // ms per individual toss reveal
   const tossDuration = speed >= 10 ? 28 : speed >= 5 ? 75 : speed >= 1 ? 310 : 620;
@@ -169,6 +171,7 @@ function WatchItHappen({
   const dayPause = speed >= 10 ? 45 : speed >= 5 ? 110 : speed >= 1 ? 370 : 740;
 
   function start() {
+    simLimitRef.current = bankrollLimit;
     yearRef.current = generateYear(bankrollLimit, winProb);
     setAnim({ phase: "running", dayIdx: 0, visibleTossCount: 0, cumulativeExposure: 0, completedDays: 0, worstDayBet: 0 });
   }
@@ -221,7 +224,8 @@ function WatchItHappen({
   const currentDay = year[anim.dayIdx];
   const visibleTosses = currentDay ? currentDay.tosses.slice(0, anim.visibleTossCount) : [];
   const todayPeakBet = visibleTosses[visibleTosses.length - 1]?.bet ?? 0;
-  const peakBetRatio = Math.min(1, todayPeakBet / bankrollLimit);
+  const simLimit = simLimitRef.current;
+  const peakBetRatio = Math.min(1, todayPeakBet / simLimit);
   const dayWon = !!(currentDay && anim.visibleTossCount >= currentDay.tosses.length && !currentDay.ruined);
   const progressPct = (anim.dayIdx / DAYS) * 100;
   const trailingLosses = visibleTosses.length > 0 && visibleTosses[visibleTosses.length - 1].result === "LOSE"
@@ -317,7 +321,7 @@ function WatchItHappen({
           {/* Bankroll limit — always visible at top */}
           <div className="flex items-center justify-between rounded-xl bg-slate-800 px-4 py-2.5">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Bankroll Limit</span>
-            <span className="font-mono text-lg font-bold text-white">{fmtFull(bankrollLimit)}</span>
+            <span className="font-mono text-lg font-bold text-white">{fmtFull(simLimit)}</span>
           </div>
 
           {/* Day counter + year progress */}
@@ -411,7 +415,7 @@ function WatchItHappen({
                     />
                   </div>
                   <p className="text-right text-xs text-slate-600">
-                    {(peakBetRatio * 100).toFixed(0)}% of {fmtShort(bankrollLimit)} limit
+                    {(peakBetRatio * 100).toFixed(0)}% of {fmtShort(simLimit)} limit
                   </p>
                 </div>
               </div>
@@ -461,8 +465,8 @@ function WatchItHappen({
               <p className="mt-2 text-sm text-slate-400">
                 After {ruinDay?.tosses.length ?? 0} consecutive losses, the next bet
                 would have been {fmtFull(requiredBet)} — exceeding your{" "}
-                <span className="text-white">{fmtFull(bankrollLimit)} limit</span> by{" "}
-                {fmtFull(requiredBet - bankrollLimit)}.
+                <span className="text-white">{fmtFull(simLimit)} limit</span> by{" "}
+                {fmtFull(requiredBet - simLimit)}.
               </p>
             </div>
 
