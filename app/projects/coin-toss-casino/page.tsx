@@ -39,7 +39,7 @@ function simulateDay(
   let bet = BASE_BET;
   let wagered = 0;
   while (true) {
-    if (wagered + bet > bankrollLimit) return { peakExposure: wagered, ruined: true };
+    if (bet > bankrollLimit) return { peakExposure: wagered, ruined: true };
     wagered += bet;
     if (Math.random() < winProb) return { peakExposure: wagered, ruined: false };
     bet *= 2;
@@ -54,7 +54,7 @@ function generateYear(bankrollLimit: number, winProb: number): DayResult[] {
     let wagered = 0;
     let ruined = false;
     while (true) {
-      if (wagered + bet > bankrollLimit) { ruined = true; break; }
+      if (bet > bankrollLimit) { ruined = true; break; }
       const won = Math.random() < winProb;
       tosses.push({ bet, result: won ? "WIN" : "LOSE" });
       wagered += bet;
@@ -204,7 +204,8 @@ function WatchItHappen({
 
         // All tosses shown — advance
         const newCum = prev.cumulativeExposure + day.peakExposure;
-        const dayPeakBet = day.tosses[day.tosses.length - 1]?.bet ?? 0;
+        const lastPlacedBet = day.tosses[day.tosses.length - 1]?.bet ?? 0;
+        const dayPeakBet = day.ruined ? lastPlacedBet * 2 : lastPlacedBet;
         const newWorstDayBet = Math.max(prev.worstDayBet, dayPeakBet);
         if (day.ruined) return { ...prev, phase: "ruin", cumulativeExposure: newCum, worstDayBet: newWorstDayBet };
         if (prev.dayIdx >= year.length - 1) return { ...prev, phase: "done", cumulativeExposure: newCum, completedDays: prev.completedDays + 1, worstDayBet: newWorstDayBet };
