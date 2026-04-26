@@ -12,7 +12,7 @@ export default function HomePage() {
 
         <div className="space-y-3 text-lg">
           <div>
-            <Link href="/projects/retirement-planner" className="hover:underline">
+            <Link href="/projects" className="hover:underline">
               Projects
             </Link>
           </div>
