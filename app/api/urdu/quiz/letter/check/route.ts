@@ -2,7 +2,6 @@ import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { urduQuizHistory } from "@/lib/db/schema";
 
-// All accepted romanizations for each canonical letter name.
 const ALTERNATES: Record<string, string[]> = {
   alef:  ["alif", "a"],
   be:    ["ba", "b"],
@@ -11,9 +10,9 @@ const ALTERNATES: Record<string, string[]> = {
   nun:   ["noon", "n"],
   meem:  ["mim", "m"],
   lam:   ["l"],
-  kaf:   ["k", "ke"],
+  kaf:   ["k"],
   re:    ["ra", "r"],
-  wao:   ["waw", "w", "vao"],
+  wao:   ["waw", "vao", "w"],
 };
 
 function isAccepted(input: string, canonical: string): boolean {
@@ -29,32 +28,28 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => null);
-  const {
-    roman_answer,
-    correct_answer,
-    question,
-    letter_name,
-    position,
-  } = (body ?? {}) as {
+  const { roman_answer, correct_answer, question } = (body ?? {}) as {
     roman_answer?: string;
     correct_answer?: string;
     question?: string;
-    letter_name?: string;
-    position?: string;
   };
 
-  if (!roman_answer || !correct_answer || !question || !letter_name || !position) {
+  if (!roman_answer || !correct_answer || !question) {
     return Response.json({ error: "Missing required fields" }, { status: 400 });
   }
+
+  // Derive letter_name and position from the values already in the payload.
+  const letter_name = correct_answer;
+  const position = question.split(":")[0].trim();
 
   const is_correct = isAccepted(roman_answer, correct_answer);
 
   const feedback = is_correct
     ? `Correct! That is ${letter_name} in ${position} form.`
-    : `Not quite. That is ${letter_name} (${correct_answer}) in ${position} form.`;
+    : `Not quite. That is ${letter_name} in ${position} form.`;
 
   await db.insert(urduQuizHistory).values({
-    userId: session.user.id,
+    userId: session.user.email ?? session.user.id,
     quizType: "letter",
     question,
     userAnswer: roman_answer.trim(),
@@ -62,5 +57,5 @@ export async function POST(request: Request) {
     isCorrect: is_correct,
   });
 
-  return Response.json({ is_correct, correct_answer, feedback });
+  return Response.json({ is_correct, correct_answer, feedback, letter_name });
 }

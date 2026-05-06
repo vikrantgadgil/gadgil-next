@@ -15,20 +15,21 @@ type CheckResult = {
   is_correct: boolean;
   correct_answer: string;
   feedback: string;
+  letter_name: string;
 };
-
-type Score = { correct: number; total: number };
 
 export default function LetterQuizPage() {
   const [question, setQuestion] = useState<Question | null>(null);
   const [loadingQuestion, setLoadingQuestion] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
   const [answer, setAnswer] = useState("");
   const [checking, setChecking] = useState(false);
   const [result, setResult] = useState<CheckResult | null>(null);
-  const [showHint, setShowHint] = useState(false);
   const [hasAnswered, setHasAnswered] = useState(false);
-  const [score, setScore] = useState<Score>({ correct: 0, total: 0 });
-  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  const [showHint, setShowHint] = useState(false);
+  const [score, setScore] = useState({ correct: 0, total: 0 });
 
   async function fetchQuestion() {
     setLoadingQuestion(true);
@@ -39,8 +40,7 @@ export default function LetterQuizPage() {
         setFetchError("Could not load a question. Please try again.");
         return;
       }
-      const data: Question = await res.json();
-      setQuestion(data);
+      setQuestion(await res.json());
     } catch {
       setFetchError("Network error. Please try again.");
     } finally {
@@ -54,7 +54,7 @@ export default function LetterQuizPage() {
 
   async function handleCheck(e: React.FormEvent) {
     e.preventDefault();
-    if (!question || !answer.trim() || hasAnswered) return;
+    if (!question || !answer.trim() || hasAnswered || checking) return;
 
     setChecking(true);
     try {
@@ -65,8 +65,6 @@ export default function LetterQuizPage() {
           roman_answer: answer.trim(),
           correct_answer: question.roman_answer,
           question: `${question.position}: ${question.question_glyph}`,
-          letter_name: question.letter_name,
-          position: question.position,
         }),
       });
       const data: CheckResult = await res.json();
@@ -98,7 +96,7 @@ export default function LetterQuizPage() {
     <main className="min-h-screen bg-slate-50 p-6 sm:p-10">
       <div className="mx-auto max-w-xl space-y-6">
 
-        {/* ── Header + score ───────────────────────────────── */}
+        {/* ── Header + score ─────────────────────────────────── */}
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Letter Quiz</h1>
@@ -106,37 +104,32 @@ export default function LetterQuizPage() {
               Identify the Urdu letter shown below
             </p>
           </div>
-          {score.total > 0 && (
-            <div className="shrink-0 rounded-xl bg-white px-4 py-2 text-sm shadow-sm ring-1 ring-slate-200">
-              <span className="font-semibold text-slate-900">
-                {score.correct}
-              </span>
-              <span className="text-slate-400"> / {score.total}</span>
-            </div>
-          )}
+          <div className="shrink-0 rounded-xl bg-white px-4 py-2 text-sm shadow-sm ring-1 ring-slate-200">
+            <span className="font-semibold text-slate-900">
+              Score: {score.correct}
+            </span>
+            <span className="text-slate-400"> / {score.total}</span>
+          </div>
         </div>
 
-        {/* ── Loading question ─────────────────────────────── */}
+        {/* ── Loading ────────────────────────────────────────── */}
         {loadingQuestion && (
           <div className="flex min-h-[260px] items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
           </div>
         )}
 
-        {/* ── Fetch error ──────────────────────────────────── */}
+        {/* ── Fetch error ────────────────────────────────────── */}
         {fetchError && !loadingQuestion && (
           <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {fetchError}
-            <button
-              onClick={fetchQuestion}
-              className="ml-3 font-medium underline"
-            >
+            {fetchError}{" "}
+            <button onClick={fetchQuestion} className="font-medium underline">
               Try again
             </button>
           </div>
         )}
 
-        {/* ── Question card ────────────────────────────────── */}
+        {/* ── Question ───────────────────────────────────────── */}
         {question && !loadingQuestion && (
           <>
             {/* Position badge */}
@@ -146,8 +139,8 @@ export default function LetterQuizPage() {
               </span>
             </div>
 
-            {/* Big letter */}
-            <div className="flex flex-col items-center rounded-3xl border border-slate-200 bg-white px-8 py-10 shadow-sm">
+            {/* Letter card */}
+            <div className="flex items-center justify-center rounded-3xl border border-slate-200 bg-white py-12 shadow-sm">
               <p
                 className="select-none text-8xl font-[family-name:var(--font-nastaliq)] leading-none"
                 dir="rtl"
@@ -162,7 +155,7 @@ export default function LetterQuizPage() {
               <button
                 type="button"
                 onClick={() => setShowHint((v) => !v)}
-                className="text-xs font-medium text-slate-400 hover:text-slate-600 transition-colors"
+                className="text-xs font-medium text-slate-400 transition-colors hover:text-slate-600"
               >
                 {showHint ? "Hide hint" : "Show hint"}
               </button>
@@ -173,7 +166,7 @@ export default function LetterQuizPage() {
               )}
             </div>
 
-            {/* ── Input form ───────────────────────────────── */}
+            {/* Input + Check */}
             <form onSubmit={handleCheck} className="flex gap-3">
               <input
                 type="text"
@@ -182,21 +175,19 @@ export default function LetterQuizPage() {
                 placeholder="Type the letter name in Roman..."
                 disabled={inputDisabled}
                 autoFocus
-                className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200 disabled:opacity-50"
+                className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm placeholder-slate-400 shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200 disabled:opacity-50"
               />
               <button
                 type="submit"
                 disabled={inputDisabled || !answer.trim()}
                 className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-slate-700 disabled:opacity-50"
               >
-                {checking ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : null}
+                {checking && <Loader2 className="h-4 w-4 animate-spin" />}
                 Check
               </button>
             </form>
 
-            {/* ── Result ───────────────────────────────────── */}
+            {/* Result */}
             {result && (
               <div
                 className={`rounded-2xl border px-5 py-4 ${
