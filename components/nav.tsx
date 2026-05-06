@@ -14,6 +14,21 @@ export async function Nav() {
           Vikrant Gadgil
         </Link>
 
+        <div className="flex items-center gap-4">
+          <Link
+            href="/projects"
+            className="text-sm text-slate-500 hover:text-slate-800 transition-colors"
+          >
+            Projects
+          </Link>
+          <Link
+            href="/urdu"
+            className="text-sm text-slate-500 hover:text-slate-800 transition-colors"
+          >
+            Urdu
+          </Link>
+        </div>
+
         <div className="flex items-center gap-3">
           {session?.user ? (
             <>

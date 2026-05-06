@@ -1,4 +1,5 @@
 import {
+  boolean,
   integer,
   jsonb,
   pgTable,
@@ -106,6 +107,45 @@ export type RetirementInputs = {
   incomeStreams: IncomeStream[];
   filingStatus: "single" | "mfj";
 };
+
+// ---------------------------------------------------------------------------
+// Urdu Writing Practice tables
+// ---------------------------------------------------------------------------
+
+export type UrduLetterComponent = {
+  letter_urdu: string;
+  letter_roman: string;
+  position: "initial" | "medial" | "final" | "standalone";
+  form_note: string;
+};
+
+export type UrduWordComponents = UrduLetterComponent[];
+
+export const urduWordCache = pgTable("urdu_word_cache", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  roman: text("roman").notNull(),
+  urduScript: text("urdu_script").notNull(),
+  components: jsonb("components").$type<UrduWordComponents>().notNull(),
+  meaning: text("meaning"),
+  pronunciationNote: text("pronunciation_note"),
+  calligraphyNote: text("calligraphy_note"),
+  createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+});
+
+export const urduQuizHistory = pgTable("urdu_quiz_history", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId").notNull(),
+  quizType: text("quiz_type").notNull(),
+  question: text("question").notNull(),
+  userAnswer: text("user_answer").notNull(),
+  correctAnswer: text("correct_answer").notNull(),
+  isCorrect: boolean("is_correct").notNull(),
+  createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+});
 
 export const retirementScenarios = pgTable("retirement_scenario", {
   id: text("id")
