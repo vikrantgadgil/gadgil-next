@@ -8,11 +8,6 @@ import {
 import { sql } from "drizzle-orm";
 import OpenAI from "openai";
 
-const deepseek = new OpenAI({
-  baseURL: "https://api.deepseek.com",
-  apiKey: process.env.DEEPSEEK_API_KEY!,
-});
-
 const SYSTEM_PROMPT =
   "You are an expert in Urdu language, script, and calligraphy. " +
   "Respond only in valid JSON with no markdown, no code fences.";
@@ -85,6 +80,11 @@ export async function POST(request: Request) {
   }
 
   // Call DeepSeek
+  const deepseek = new OpenAI({
+    baseURL: "https://api.deepseek.com",
+    apiKey: process.env.DEEPSEEK_API_KEY!,
+  });
+
   let parsed: DeepSeekResult;
   try {
     const completion = await deepseek.chat.completions.create({
