@@ -44,14 +44,19 @@ function isValidResult(obj: unknown): obj is DeepSeekResult {
 }
 
 export async function GET() {
+  console.log("[word-quiz] GET called");
+
   const session = await auth();
   if (!session?.user?.id) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  console.log("[word-quiz] DEEPSEEK_API_KEY defined:", !!process.env.DEEPSEEK_API_KEY);
+
   const deepseek = new OpenAI({
     baseURL: "https://api.deepseek.com",
     apiKey: process.env.DEEPSEEK_API_KEY!,
+    timeout: 10_000,
   });
 
   let parsed: DeepSeekResult;
@@ -66,17 +71,19 @@ export async function GET() {
     });
 
     const raw = completion.choices[0]?.message?.content ?? "";
+    console.log("[word-quiz] raw response:", raw);
     const obj: unknown = JSON.parse(raw);
     if (!isValidResult(obj)) {
       return Response.json(
         { error: "DeepSeek returned an unexpected shape" },
-        { status: 502 }
+        { status: 500 }
       );
     }
     parsed = obj;
   } catch (err) {
     const message = err instanceof Error ? err.message : "DeepSeek call failed";
-    return Response.json({ error: message }, { status: 502 });
+    console.error("[word-quiz] error:", message);
+    return Response.json({ error: message }, { status: 500 });
   }
 
   // Grow the cache passively — skip insert if roman already present.

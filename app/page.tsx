@@ -18,12 +18,6 @@ export default function HomePage() {
           </div>
 
           <div>
-            <Link href="/urdu" className="hover:underline">
-              Urdu Writing Practice
-            </Link>
-          </div>
-
-          <div>
             <span className="text-slate-400">Poetry (coming soon)</span>
           </div>
 

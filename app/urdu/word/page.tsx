@@ -55,7 +55,7 @@ export default function WordLookupPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 p-6 sm:p-10">
+    <main className="bg-slate-50 p-6 sm:p-10">
       <div className="mx-auto max-w-2xl space-y-8">
 
         {/* ── Header ─────────────────────────────────────────── */}

@@ -93,7 +93,7 @@ export default function LetterQuizPage() {
   const inputDisabled = checking || hasAnswered || loadingQuestion;
 
   return (
-    <main className="min-h-screen bg-slate-50 p-6 sm:p-10">
+    <main className="bg-slate-50 p-6 sm:p-10">
       <div className="mx-auto max-w-xl space-y-6">
 
         {/* ── Header + score ─────────────────────────────────── */}
