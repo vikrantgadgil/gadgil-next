@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 type LetterComponent = {
@@ -20,21 +21,19 @@ type LookupResult = {
   fromCache: boolean;
 };
 
-export default function WordLookupPage() {
+function WordLookupPageInner() {
+  const searchParams = useSearchParams();
   const [query, setQuery] = useState("");
   const [result, setResult] = useState<LookupResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const trimmed = query.trim();
+  const doLookup = useCallback(async (roman: string) => {
+    const trimmed = roman.trim();
     if (!trimmed) return;
-
     setLoading(true);
     setResult(null);
     setError(null);
-
     try {
       const res = await fetch("/api/urdu/word", {
         method: "POST",
@@ -52,6 +51,19 @@ export default function WordLookupPage() {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q) {
+      setQuery(q);
+      doLookup(q);
+    }
+  }, [searchParams, doLookup]);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    doLookup(query);
   }
 
   return (
@@ -82,9 +94,7 @@ export default function WordLookupPage() {
             disabled={loading || !query.trim()}
             className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-slate-700 disabled:opacity-50"
           >
-            {loading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : null}
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             Look up
           </button>
         </form>
@@ -200,5 +210,13 @@ export default function WordLookupPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function WordLookupPage() {
+  return (
+    <Suspense>
+      <WordLookupPageInner />
+    </Suspense>
   );
 }

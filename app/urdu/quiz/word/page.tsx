@@ -7,9 +7,9 @@ type Question = {
   urdu_script: string;
   roman: string;
   meaning: string;
-  component_count: number;
-  question_type: "meaning" | "length";
+  question_type: "meaning" | "spelling";
   correct_answer: string;
+  from_cache: boolean;
 };
 
 type CheckResult = {
@@ -24,6 +24,7 @@ export default function WordQuizPage() {
   const [question, setQuestion] = useState<Question | null>(null);
   const [loadingQuestion, setLoadingQuestion] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [lastShown, setLastShown] = useState<string[]>([]);
 
   const [answer, setAnswer] = useState("");
   const [checking, setChecking] = useState(false);
@@ -35,13 +36,19 @@ export default function WordQuizPage() {
   async function fetchQuestion() {
     setLoadingQuestion(true);
     setFetchError(null);
+    const exclude =
+      lastShown.length > 0 ? `?exclude=${lastShown.join(",")}` : "";
     try {
-      const res = await fetch("/api/urdu/quiz/word");
+      const res = await fetch(`/api/urdu/quiz/word${exclude}`);
       if (!res.ok) {
         setFetchError("Could not load a question. Please try again.");
         return;
       }
-      setQuestion(await res.json());
+      const data = await res.json();
+      setQuestion(data);
+      setLastShown((prev) =>
+        [...prev, data.roman.toLowerCase()].slice(-10)
+      );
     } catch {
       setFetchError("Network error. Please try again.");
     } finally {
@@ -97,8 +104,8 @@ export default function WordQuizPage() {
 
   const hintText =
     question?.question_type === "meaning"
-      ? `What does this word mean in English? (${question.component_count} letters)`
-      : `How do you spell this word in Roman Urdu?`;
+      ? "What does this word mean in English?"
+      : "How do you spell this word in Roman Urdu?";
 
   return (
     <main className="bg-slate-50 p-6 sm:p-10">
@@ -124,7 +131,7 @@ export default function WordQuizPage() {
         {loadingQuestion && (
           <div className="flex min-h-[260px] flex-col items-center justify-center gap-3">
             <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-            <p className="text-sm text-slate-400">Finding a word…</p>
+            <p className="text-sm text-slate-400">Loading next word...</p>
           </div>
         )}
 
@@ -223,13 +230,21 @@ export default function WordQuizPage() {
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700"
-                >
-                  Next word →
-                </button>
+                <div className="mt-4 flex items-center gap-4">
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700"
+                  >
+                    Next word →
+                  </button>
+                  <a
+                    href={`/urdu/word?q=${encodeURIComponent(question.roman)}`}
+                    className="text-xs font-medium text-slate-400 transition-colors hover:text-slate-600"
+                  >
+                    See full breakdown →
+                  </a>
+                </div>
               </div>
             )}
           </>
