@@ -7,6 +7,7 @@ const TABS = [
   { href: "/urdu/word", label: "Word Lookup" },
   { href: "/urdu/quiz/letter", label: "Letter Quiz" },
   { href: "/urdu/quiz/word", label: "Word Quiz" },
+  { href: "/urdu/words", label: "My Words" },
 ] as const;
 
 export function UrduNav() {

@@ -27,6 +27,8 @@ function WordLookupPageInner() {
   const [result, setResult] = useState<LookupResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const doLookup = useCallback(async (roman: string) => {
     const trimmed = roman.trim();
@@ -34,18 +36,26 @@ function WordLookupPageInner() {
     setLoading(true);
     setResult(null);
     setError(null);
+    setSaved(false);
     try {
-      const res = await fetch("/api/urdu/word", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ roman: trimmed }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
+      const [lookupRes, checkRes] = await Promise.all([
+        fetch("/api/urdu/word", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ roman: trimmed }),
+        }),
+        fetch(`/api/urdu/words/check?roman=${encodeURIComponent(trimmed)}`),
+      ]);
+      const data = await lookupRes.json();
+      if (!lookupRes.ok) {
         setError(data.error ?? "Lookup failed. Please try again.");
         return;
       }
       setResult(data as LookupResult);
+      if (checkRes.ok) {
+        const checkData = await checkRes.json();
+        setSaved(checkData.saved ?? false);
+      }
     } catch {
       setError("Network error. Please try again.");
     } finally {
@@ -64,6 +74,25 @@ function WordLookupPageInner() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     doLookup(query);
+  }
+
+  async function handleSave() {
+    if (!result || saving || saved) return;
+    setSaving(true);
+    try {
+      await fetch("/api/urdu/words/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          roman: result.roman,
+          urdu_script: result.urdu_script,
+          meaning: result.meaning ?? "",
+        }),
+      });
+      setSaved(true);
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -136,6 +165,29 @@ function WordLookupPageInner() {
                 <p className="mt-3 text-lg font-medium text-slate-700">
                   {result.meaning}
                 </p>
+              )}
+            </div>
+
+            {/* Save button */}
+            <div className="flex justify-center">
+              {saved ? (
+                <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 ring-1 ring-emerald-100">
+                  ✓ Saved to my words
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-50"
+                >
+                  {saving ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <span>★</span>
+                  )}
+                  Save to my words
+                </button>
               )}
             </div>
 

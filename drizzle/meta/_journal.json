@@ -22,6 +22,13 @@
       "when": 1778032735202,
       "tag": "0002_overconfident_micromax",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1778351315072,
+      "tag": "0003_pale_vance_astro",
+      "breakpoints": true
     }
   ]
 }

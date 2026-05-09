@@ -6,6 +6,7 @@ import {
   primaryKey,
   text,
   timestamp,
+  unique,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "@auth/core/adapters";
 
@@ -146,6 +147,23 @@ export const urduQuizHistory = pgTable("urdu_quiz_history", {
   isCorrect: boolean("is_correct").notNull(),
   createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
 });
+
+export const urduUserWords = pgTable(
+  "urdu_user_words",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id").notNull(),
+    roman: text("roman").notNull(),
+    urduScript: text("urdu_script").notNull(),
+    meaning: text("meaning").notNull(),
+    addedAt: timestamp("added_at", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [unique().on(t.userId, t.roman)]
+);
+
+export type UrduUserWord = typeof urduUserWords.$inferSelect;
 
 export const retirementScenarios = pgTable("retirement_scenario", {
   id: text("id")

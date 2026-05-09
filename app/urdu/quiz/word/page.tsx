@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 
+type QuizMode = "random" | "mywords";
+
 type Question = {
   urdu_script: string;
   roman: string;
@@ -20,10 +22,20 @@ type CheckResult = {
   roman: string;
 };
 
+type SavedWord = {
+  id: string;
+  roman: string;
+  urduScript: string;
+  meaning: string;
+};
+
 export default function WordQuizPage() {
+  const [quizMode, setQuizMode] = useState<QuizMode>("random");
+
   const [question, setQuestion] = useState<Question | null>(null);
   const [loadingQuestion, setLoadingQuestion] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [myWordsEmpty, setMyWordsEmpty] = useState(false);
   const [lastShown, setLastShown] = useState<string[]>([]);
 
   const [answer, setAnswer] = useState("");
@@ -32,23 +44,68 @@ export default function WordQuizPage() {
   const [hasAnswered, setHasAnswered] = useState(false);
 
   const [score, setScore] = useState({ correct: 0, total: 0 });
+  const [wordSaved, setWordSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [removing, setRemoving] = useState(false);
 
-  async function fetchQuestion() {
+  async function fetchRandomQuestion(excluded: string[]) {
+    const exclude =
+      excluded.length > 0 ? `?exclude=${excluded.join(",")}` : "";
+    const res = await fetch(`/api/urdu/quiz/word${exclude}`);
+    if (!res.ok) throw new Error("fetch failed");
+    const data = await res.json();
+    setQuestion(data);
+    setLastShown((prev) => [...prev, data.roman.toLowerCase()].slice(-10));
+    setWordSaved(false);
+  }
+
+  async function fetchMyWordQuestion(excluded: string[]) {
+    const res = await fetch("/api/urdu/words/list");
+    if (!res.ok) throw new Error("fetch failed");
+    const data = await res.json();
+    const words: SavedWord[] = data.words ?? [];
+
+    if (words.length === 0) {
+      setMyWordsEmpty(true);
+      setQuestion(null);
+      return;
+    }
+    setMyWordsEmpty(false);
+
+    const available = words.filter(
+      (w) => !excluded.includes(w.roman.toLowerCase())
+    );
+    const pool = available.length > 0 ? available : words;
+    const word = pool[Math.floor(Math.random() * pool.length)];
+
+    const question_type = word.roman.length <= 4 ? "meaning" : "spelling";
+    const correct_answer =
+      question_type === "meaning"
+        ? word.meaning.toLowerCase()
+        : word.roman.toLowerCase();
+
+    setQuestion({
+      urdu_script: word.urduScript,
+      roman: word.roman,
+      meaning: word.meaning,
+      question_type,
+      correct_answer,
+      from_cache: false,
+    });
+    setLastShown((prev) => [...prev, word.roman.toLowerCase()].slice(-10));
+    setWordSaved(true);
+  }
+
+  async function fetchQuestion(excluded: string[], mode: QuizMode) {
     setLoadingQuestion(true);
     setFetchError(null);
-    const exclude =
-      lastShown.length > 0 ? `?exclude=${lastShown.join(",")}` : "";
+    setMyWordsEmpty(false);
     try {
-      const res = await fetch(`/api/urdu/quiz/word${exclude}`);
-      if (!res.ok) {
-        setFetchError("Could not load a question. Please try again.");
-        return;
+      if (mode === "mywords") {
+        await fetchMyWordQuestion(excluded);
+      } else {
+        await fetchRandomQuestion(excluded);
       }
-      const data = await res.json();
-      setQuestion(data);
-      setLastShown((prev) =>
-        [...prev, data.roman.toLowerCase()].slice(-10)
-      );
     } catch {
       setFetchError("Network error. Please try again.");
     } finally {
@@ -57,8 +114,15 @@ export default function WordQuizPage() {
   }
 
   useEffect(() => {
-    fetchQuestion();
-  }, []);
+    setQuestion(null);
+    setAnswer("");
+    setResult(null);
+    setHasAnswered(false);
+    setWordSaved(false);
+    setLastShown([]);
+    fetchQuestion([], quizMode);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quizMode]);
 
   async function handleCheck(e: React.FormEvent) {
     e.preventDefault();
@@ -96,8 +160,43 @@ export default function WordQuizPage() {
     setAnswer("");
     setResult(null);
     setHasAnswered(false);
+    setWordSaved(false);
     setQuestion(null);
-    fetchQuestion();
+    fetchQuestion(lastShown, quizMode);
+  }
+
+  async function handleSave() {
+    if (!question || saving || wordSaved) return;
+    setSaving(true);
+    try {
+      await fetch("/api/urdu/words/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          roman: question.roman,
+          urdu_script: question.urdu_script,
+          meaning: question.meaning,
+        }),
+      });
+      setWordSaved(true);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleRemove() {
+    if (!question || removing) return;
+    setRemoving(true);
+    try {
+      await fetch("/api/urdu/words/remove", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roman: question.roman }),
+      });
+      handleNext();
+    } finally {
+      setRemoving(false);
+    }
   }
 
   const inputDisabled = checking || hasAnswered || loadingQuestion;
@@ -127,6 +226,32 @@ export default function WordQuizPage() {
           </div>
         </div>
 
+        {/* ── Mode toggle ────────────────────────────────────── */}
+        <div className="flex rounded-xl bg-slate-100 p-1 text-sm font-medium">
+          <button
+            type="button"
+            onClick={() => setQuizMode("random")}
+            className={`flex-1 rounded-lg px-3 py-1.5 transition-colors ${
+              quizMode === "random"
+                ? "bg-white text-slate-900 shadow-sm"
+                : "text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            Random Word
+          </button>
+          <button
+            type="button"
+            onClick={() => setQuizMode("mywords")}
+            className={`flex-1 rounded-lg px-3 py-1.5 transition-colors ${
+              quizMode === "mywords"
+                ? "bg-white text-slate-900 shadow-sm"
+                : "text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            My Words
+          </button>
+        </div>
+
         {/* ── Loading ────────────────────────────────────────── */}
         {loadingQuestion && (
           <div className="flex min-h-[260px] flex-col items-center justify-center gap-3">
@@ -135,11 +260,31 @@ export default function WordQuizPage() {
           </div>
         )}
 
+        {/* ── My Words empty state ───────────────────────────── */}
+        {!loadingQuestion && myWordsEmpty && (
+          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center">
+            <p className="text-slate-600">You have no saved words yet.</p>
+            <p className="mt-1 text-sm text-slate-400">
+              Save words from{" "}
+              <a
+                href="/urdu/word"
+                className="underline hover:text-slate-600"
+              >
+                Word Lookup
+              </a>{" "}
+              or Word Quiz to practice them here.
+            </p>
+          </div>
+        )}
+
         {/* ── Fetch error ────────────────────────────────────── */}
         {fetchError && !loadingQuestion && (
           <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {fetchError}{" "}
-            <button onClick={fetchQuestion} className="font-medium underline">
+            <button
+              onClick={() => fetchQuestion(lastShown, quizMode)}
+              className="font-medium underline"
+            >
               Try again
             </button>
           </div>
@@ -230,7 +375,7 @@ export default function WordQuizPage() {
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-center gap-4">
+                <div className="mt-4 flex flex-wrap items-center gap-3">
                   <button
                     type="button"
                     onClick={handleNext}
@@ -238,12 +383,51 @@ export default function WordQuizPage() {
                   >
                     Next word →
                   </button>
+
                   <a
                     href={`/urdu/word?q=${encodeURIComponent(question.roman)}`}
                     className="text-xs font-medium text-slate-400 transition-colors hover:text-slate-600"
                   >
                     See full breakdown →
                   </a>
+
+                  {quizMode === "random" && (
+                    wordSaved ? (
+                      <span className="text-xs font-medium text-emerald-600">
+                        ✓ Saved
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleSave}
+                        disabled={saving}
+                        className="inline-flex items-center gap-1 text-xs font-medium text-slate-400 transition-colors hover:text-slate-600 disabled:opacity-50"
+                      >
+                        {saving ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          "★"
+                        )}{" "}
+                        Save this word
+                      </button>
+                    )
+                  )}
+
+                  {quizMode === "mywords" && (
+                    <button
+                      type="button"
+                      onClick={handleRemove}
+                      disabled={removing}
+                      className="inline-flex items-center gap-1 text-xs font-medium text-red-400 transition-colors hover:text-red-600 disabled:opacity-50"
+                    >
+                      {removing ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        "✕"
+                      )}{" "}
+                      Remove from my list
+                    </button>
+                  )}
                 </div>
               </div>
             )}
