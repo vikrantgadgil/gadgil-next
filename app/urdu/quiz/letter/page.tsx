@@ -9,6 +9,7 @@ type Question = {
   roman_answer: string;
   letter_name: string;
   hint: string;
+  alternates: string[];
 };
 
 type CheckResult = {
@@ -30,17 +31,23 @@ export default function LetterQuizPage() {
 
   const [showHint, setShowHint] = useState(false);
   const [score, setScore] = useState({ correct: 0, total: 0 });
+  const [lastShown, setLastShown] = useState<string[]>([]);
 
   async function fetchQuestion() {
     setLoadingQuestion(true);
     setFetchError(null);
+    const exclude = lastShown.length > 0 ? `?exclude=${lastShown.join(",")}` : "";
     try {
-      const res = await fetch("/api/urdu/quiz/letter");
+      const res = await fetch(`/api/urdu/quiz/letter${exclude}`);
       if (!res.ok) {
         setFetchError("Could not load a question. Please try again.");
         return;
       }
-      setQuestion(await res.json());
+      const data = await res.json();
+      setQuestion(data);
+      setLastShown((prev) =>
+        [...prev, `${data.letter_name}-${data.position}`].slice(-5)
+      );
     } catch {
       setFetchError("Network error. Please try again.");
     } finally {
@@ -65,6 +72,7 @@ export default function LetterQuizPage() {
           roman_answer: answer.trim(),
           correct_answer: question.roman_answer,
           question: `${question.position}: ${question.question_glyph}`,
+          alternates: question.alternates,
         }),
       });
       const data: CheckResult = await res.json();

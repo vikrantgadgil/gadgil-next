@@ -15,9 +15,10 @@ const ALTERNATES: Record<string, string[]> = {
   wao:   ["waw", "vao", "w"],
 };
 
-function isAccepted(input: string, canonical: string): boolean {
+function isAccepted(input: string, canonical: string, bodyAlternates: string[]): boolean {
   const norm = input.toLowerCase().trim();
   if (norm === canonical) return true;
+  if (bodyAlternates.map((a) => a.toLowerCase().trim()).includes(norm)) return true;
   return (ALTERNATES[canonical] ?? []).includes(norm);
 }
 
@@ -28,10 +29,11 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => null);
-  const { roman_answer, correct_answer, question } = (body ?? {}) as {
+  const { roman_answer, correct_answer, question, alternates } = (body ?? {}) as {
     roman_answer?: string;
     correct_answer?: string;
     question?: string;
+    alternates?: string[];
   };
 
   if (!roman_answer || !correct_answer || !question) {
@@ -42,7 +44,7 @@ export async function POST(request: Request) {
   const letter_name = correct_answer;
   const position = question.split(":")[0].trim();
 
-  const is_correct = isAccepted(roman_answer, correct_answer);
+  const is_correct = isAccepted(roman_answer, correct_answer, alternates ?? []);
 
   const feedback = is_correct
     ? `Correct! That is ${letter_name} in ${position} form.`
