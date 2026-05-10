@@ -16,7 +16,7 @@ export default async function UrduLayout({
 }) {
   const session = await auth();
   if (!session?.user?.id) {
-    redirect("/signin");
+    redirect("/signin?callbackUrl=/urdu");
   }
 
   return (
