@@ -375,6 +375,25 @@ export default function WordQuizPage() {
                   </div>
                 </div>
 
+                <div className="mt-3 border-t border-slate-200 pt-3">
+                  <p className="mb-2 text-xs font-medium text-slate-400">Two scripts</p>
+                  <div className="flex items-center justify-center gap-6">
+                    <div className="flex flex-col items-center gap-1">
+                      <p className="text-3xl font-[family-name:var(--font-nastaliq)] leading-none" dir="rtl" lang="ur">
+                        {question.urdu_script}
+                      </p>
+                      <span className="text-xs text-slate-400">Nastaliq</span>
+                    </div>
+                    <div className="h-8 w-px bg-slate-200" />
+                    <div className="flex flex-col items-center gap-1">
+                      <p className="text-3xl font-[family-name:var(--font-naskh)] leading-none" dir="rtl" lang="ur">
+                        {question.urdu_script}
+                      </p>
+                      <span className="text-xs text-slate-400">Naskh</span>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="mt-4 flex flex-wrap items-center gap-3">
                   <button
                     type="button"

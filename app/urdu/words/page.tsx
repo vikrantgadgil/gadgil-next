@@ -72,7 +72,8 @@ export default function MyWordsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  <th className="px-4 py-3 text-right">Urdu</th>
+                  <th className="px-4 py-3 text-right">Nastaliq</th>
+                  <th className="px-4 py-3 text-right">Naskh</th>
                   <th className="px-4 py-3">Roman</th>
                   <th className="px-4 py-3">Meaning</th>
                   <th className="px-4 py-3"></th>
@@ -85,7 +86,14 @@ export default function MyWordsPage() {
                     className="border-b border-slate-100 last:border-0"
                   >
                     <td
-                      className="px-4 py-3 text-right text-2xl font-[family-name:var(--font-nastaliq)]"
+                      className="px-4 py-3 text-right text-xl font-[family-name:var(--font-nastaliq)]"
+                      dir="rtl"
+                      lang="ur"
+                    >
+                      {w.urduScript}
+                    </td>
+                    <td
+                      className="px-4 py-3 text-right text-xl font-[family-name:var(--font-naskh)]"
                       dir="rtl"
                       lang="ur"
                     >

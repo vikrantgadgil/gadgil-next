@@ -229,6 +229,16 @@ export default function LetterQuizPage() {
                   </div>
                 </div>
 
+                <div className="mt-3 border-t border-slate-200 pt-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-medium text-slate-500">Naskh form:</span>
+                    <p className="text-3xl font-[family-name:var(--font-naskh)] leading-none" dir="rtl" lang="ur">
+                      {question.question_glyph}
+                    </p>
+                  </div>
+                  <p className="mt-1 text-xs text-slate-400">This is how this letter appears in digital text</p>
+                </div>
+
                 <button
                   type="button"
                   onClick={handleNext}

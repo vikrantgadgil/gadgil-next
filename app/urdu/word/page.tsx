@@ -152,19 +152,26 @@ function WordLookupPageInner() {
               </span>
             </div>
 
-            {/* Large Urdu script */}
-            <div className="rounded-2xl border border-slate-200 bg-white px-6 py-8 text-center shadow-sm">
-              <p
-                className="text-6xl font-[family-name:var(--font-nastaliq)] leading-loose"
-                dir="rtl"
-                lang="ur"
-              >
-                {result.urdu_script}
-              </p>
+            {/* Large Urdu script — two fonts */}
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div className="flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+                <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 py-8">
+                  <p className="text-xs font-medium tracking-wide text-slate-400">Nastaliq — calligraphic</p>
+                  <p className="text-5xl font-[family-name:var(--font-nastaliq)] leading-loose" dir="rtl" lang="ur">
+                    {result.urdu_script}
+                  </p>
+                </div>
+                <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 py-8">
+                  <p className="text-xs font-medium tracking-wide text-slate-400">Naskh — digital</p>
+                  <p className="text-5xl font-[family-name:var(--font-naskh)] leading-loose" dir="rtl" lang="ur">
+                    {result.urdu_script}
+                  </p>
+                </div>
+              </div>
               {result.meaning && (
-                <p className="mt-3 text-lg font-medium text-slate-700">
-                  {result.meaning}
-                </p>
+                <div className="border-t border-slate-100 px-6 py-3 text-center">
+                  <p className="text-lg font-medium text-slate-700">{result.meaning}</p>
+                </div>
               )}
             </div>
 
@@ -223,7 +230,8 @@ function WordLookupPageInner() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-slate-100 bg-slate-50 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
-                        <th className="px-4 py-3 text-right">Urdu Letter</th>
+                        <th className="px-4 py-3 text-right">Nastaliq</th>
+                        <th className="px-4 py-3 text-right">Naskh</th>
                         <th className="px-4 py-3">Roman</th>
                         <th className="px-4 py-3">Position</th>
                         <th className="px-4 py-3">Note</th>
@@ -237,6 +245,13 @@ function WordLookupPageInner() {
                         >
                           <td
                             className="px-4 py-3 text-right text-xl font-[family-name:var(--font-nastaliq)]"
+                            dir="rtl"
+                            lang="ur"
+                          >
+                            {c.letter_urdu}
+                          </td>
+                          <td
+                            className="px-4 py-3 text-right text-xl font-[family-name:var(--font-naskh)]"
                             dir="rtl"
                             lang="ur"
                           >
