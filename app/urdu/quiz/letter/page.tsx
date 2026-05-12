@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { UrduLetters } from "@/lib/urdu/letters";
+import { UrduLetterDetail } from "@/components/urdu-letter-detail";
 
 type Question = {
   question_glyph: string;
@@ -32,6 +34,12 @@ export default function LetterQuizPage() {
   const [showHint, setShowHint] = useState(false);
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const [lastShown, setLastShown] = useState<string[]>([]);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const currentLetter = question
+    ? UrduLetters.find((l) => l.name === question.letter_name) ?? null
+    : null;
 
   async function fetchQuestion() {
     setLoadingQuestion(true);
@@ -158,6 +166,17 @@ export default function LetterQuizPage() {
               </p>
             </div>
 
+            {/* View all forms button */}
+            <div className="flex justify-center">
+              <button
+                type="button"
+                onClick={() => setDialogOpen(true)}
+                className="text-xs font-medium text-slate-400 transition-colors hover:text-slate-600"
+              >
+                View all forms →
+              </button>
+            </div>
+
             {/* Hint toggle */}
             <div>
               <button
@@ -226,17 +245,30 @@ export default function LetterQuizPage() {
                         </span>
                       </p>
                     )}
+                    <button
+                      type="button"
+                      onClick={() => setDialogOpen(true)}
+                      className="mt-2 text-xs font-medium text-slate-400 transition-colors hover:text-slate-600"
+                    >
+                      View all forms of this letter →
+                    </button>
                   </div>
                 </div>
 
                 <div className="mt-3 border-t border-slate-200 pt-3">
                   <div className="flex items-center gap-3">
                     <span className="text-xs font-medium text-slate-500">Naskh form:</span>
-                    <p className="text-3xl font-[family-name:var(--font-naskh)] leading-none" dir="rtl" lang="ur">
+                    <p
+                      className="text-3xl font-[family-name:var(--font-naskh)] leading-none"
+                      dir="rtl"
+                      lang="ur"
+                    >
                       {question.question_glyph}
                     </p>
                   </div>
-                  <p className="mt-1 text-xs text-slate-400">This is how this letter appears in digital text</p>
+                  <p className="mt-1 text-xs text-slate-400">
+                    This is how this letter appears in digital text
+                  </p>
                 </div>
 
                 <button
@@ -251,6 +283,15 @@ export default function LetterQuizPage() {
           </>
         )}
       </div>
+
+      {/* ── Letter detail dialog ───────────────────────────── */}
+      {currentLetter && (
+        <UrduLetterDetail
+          letter={currentLetter}
+          open={dialogOpen}
+          onClose={() => setDialogOpen(false)}
+        />
+      )}
     </main>
   );
 }

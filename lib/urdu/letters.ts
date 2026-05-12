@@ -3,6 +3,12 @@ export type UrduLetterForm = {
   hint: string;
 };
 
+type SampleWord = {
+  roman: string;
+  urdu_script: string;
+  meaning: string;
+};
+
 export type UrduLetter = {
   name: string;
   alternates: string[];
@@ -10,6 +16,14 @@ export type UrduLetter = {
   initial: UrduLetterForm;
   medial: UrduLetterForm;
   final: UrduLetterForm;
+  pronunciation: string;
+  mnemonic: string;
+  sample_words: {
+    standalone: SampleWord;
+    initial: SampleWord;
+    medial: SampleWord;
+    final: SampleWord;
+  };
 };
 
 export const UrduLetters: UrduLetter[] = [
@@ -20,6 +34,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﺍ", hint: "Alef at word start looks identical to standalone — it never connects to the following letter." },
     medial:     { glyph: "ﺎ", hint: "Alef in medial position looks like final — it attaches to the preceding letter but not the following." },
     final:      { glyph: "ﺎ", hint: "Alef final: the upright stroke attaches to the preceding letter's connecting line on its right." },
+    pronunciation: "a vowel seat — carries 'a', 'i', or 'u' at word start; lengthens a preceding vowel in the middle of a word; often silent",
+    mnemonic: "a single upright post — the simplest stroke in the alphabet, standing alone",
+    sample_words: {
+      standalone: { roman: "umeed",  urdu_script: "امید", meaning: "hope" },
+      initial:    { roman: "umeed",  urdu_script: "امید", meaning: "hope" },
+      medial:     { roman: "hawa",   urdu_script: "ہوا",  meaning: "wind/air" },
+      final:      { roman: "hawa",   urdu_script: "ہوا",  meaning: "wind/air" },
+    },
   },
   {
     name: "alef-madda",
@@ -28,6 +50,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﺁ", hint: "Alef madda at word start looks identical to standalone — it does not connect forward." },
     medial:     { glyph: "ﺂ", hint: "Alef madda in medial position looks like final — attaches to the preceding letter but not the following." },
     final:      { glyph: "ﺂ", hint: "Alef madda final: wavy mark above, stroke attached to the preceding letter on its right." },
+    pronunciation: "a long open 'aa' as in 'father' — the wavy madda mark stretches the vowel",
+    mnemonic: "alef wearing a crown — the wavy mark above doubles the length of the sound",
+    sample_words: {
+      standalone: { roman: "aag",  urdu_script: "آگ",  meaning: "fire" },
+      initial:    { roman: "aag",  urdu_script: "آگ",  meaning: "fire" },
+      medial:     { roman: "maah", urdu_script: "ماہ", meaning: "moon (poetic)" },
+      final:      { roman: "maah", urdu_script: "ماہ", meaning: "moon (poetic)" },
+    },
   },
   {
     name: "be",
@@ -36,6 +66,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﺑ", hint: "Be initial: a short tooth-like stroke open to the right for connecting forward, one dot below." },
     medial:     { glyph: "ﺒ", hint: "Be medial: a tiny connecting tooth between letters, one dot below." },
     final:      { glyph: "ﺐ", hint: "Be final: the bowl extends into a long sweeping leftward tail, one dot below." },
+    pronunciation: "sounds like 'b' in 'boy'",
+    mnemonic: "a boat with one dot below the hull — one passenger below deck",
+    sample_words: {
+      standalone: { roman: "bura",     urdu_script: "برا",    meaning: "bad" },
+      initial:    { roman: "bhai",     urdu_script: "بھائی",  meaning: "brother" },
+      medial:     { roman: "mohabbat", urdu_script: "محبت",   meaning: "love" },
+      final:      { roman: "betaab",   urdu_script: "بے تاب", meaning: "impatient" },
+    },
   },
   {
     name: "pe",
@@ -44,6 +82,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﭘ", hint: "Pe initial: short connecting stroke open to the right, three dots below." },
     medial:     { glyph: "ﭙ", hint: "Pe medial: tiny connecting tooth, three dots below distinguish it from be." },
     final:      { glyph: "ﭗ", hint: "Pe final: same long sweeping tail as be's final form, three dots below." },
+    pronunciation: "sounds like 'p' in 'pen'",
+    mnemonic: "a boat with three dots below — three passengers below deck",
+    sample_words: {
+      standalone: { roman: "pyar",  urdu_script: "پیار", meaning: "affection" },
+      initial:    { roman: "pani",  urdu_script: "پانی", meaning: "water" },
+      medial:     { roman: "sapna", urdu_script: "سپنا", meaning: "dream" },
+      final:      { roman: "aap",   urdu_script: "آپ",   meaning: "you (formal)" },
+    },
   },
   {
     name: "te",
@@ -52,6 +98,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﺗ", hint: "Te initial: short connecting stroke open to the right, two dots above." },
     medial:     { glyph: "ﺘ", hint: "Te medial: tiny connecting tooth, two dots above the stroke." },
     final:      { glyph: "ﺖ", hint: "Te final: long leftward sweeping tail, two dots above." },
+    pronunciation: "a dental 't' — tongue touches upper teeth, softer than English 't'",
+    mnemonic: "a boat with two dots on the upper deck — two passengers waving from above",
+    sample_words: {
+      standalone: { roman: "tanha",    urdu_script: "تنہا",  meaning: "lonely" },
+      initial:    { roman: "tamanna",  urdu_script: "تمنا",  meaning: "wish" },
+      medial:     { roman: "sitara",   urdu_script: "ستارہ", meaning: "star" },
+      final:      { roman: "mohabbat", urdu_script: "محبت",  meaning: "love" },
+    },
   },
   {
     name: "tte",
@@ -60,6 +114,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﭨ", hint: "Tte initial: connecting stroke with the retroflex subscript mark below." },
     medial:     { glyph: "ﭩ", hint: "Tte medial: tiny tooth with the distinctive retroflex mark below." },
     final:      { glyph: "ﭧ", hint: "Tte final: sweeping tail with the retroflex subscript mark below, distinguishing it from te." },
+    pronunciation: "a retroflex 't' — curl the tongue tip back to touch the roof of the mouth before releasing",
+    mnemonic: "a te with a small curl below — the curl tag is your cue to curl your tongue",
+    sample_words: {
+      standalone: { roman: "thanda", urdu_script: "ٹھنڈا", meaning: "cold" },
+      initial:    { roman: "thanda", urdu_script: "ٹھنڈا", meaning: "cold" },
+      medial:     { roman: "roti",   urdu_script: "روٹی",  meaning: "bread" },
+      final:      { roman: "pet",    urdu_script: "پیٹ",   meaning: "stomach" },
+    },
   },
   {
     name: "se",
@@ -68,6 +130,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﺛ", hint: "Se initial: connecting stroke with three dots above in a triangular arrangement." },
     medial:     { glyph: "ﺜ", hint: "Se medial: tiny tooth with three dots above." },
     final:      { glyph: "ﺚ", hint: "Se final: sweeping tail with three dots above arranged in a triangle." },
+    pronunciation: "sounds like 's' in 'sun' — in standard Urdu merged with seen",
+    mnemonic: "a boat with three dots above in a triangle — a three-peaked crown sitting on the hull",
+    sample_words: {
+      standalone: { roman: "saboot", urdu_script: "ثبوت",  meaning: "proof" },
+      initial:    { roman: "saboot", urdu_script: "ثبوت",  meaning: "proof" },
+      medial:     { roman: "misaal", urdu_script: "مثال",  meaning: "example" },
+      final:      { roman: "miras",  urdu_script: "میراث", meaning: "inheritance" },
+    },
   },
   {
     name: "jeem",
@@ -76,6 +146,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﺟ", hint: "Jeem initial: the rounded head connects to the right, hook and dot visible below." },
     medial:     { glyph: "ﺠ", hint: "Jeem medial: small connecting form with the curved hook and dot below." },
     final:      { glyph: "ﺞ", hint: "Jeem final: the full deep downward hook with a dot, attached to the preceding letter." },
+    pronunciation: "sounds like 'j' in 'jump'",
+    mnemonic: "a fishhook with a dot inside the curve — the dot is the bait",
+    sample_words: {
+      standalone: { roman: "jaan",   urdu_script: "جان",   meaning: "life/soul" },
+      initial:    { roman: "junoon", urdu_script: "جنون",  meaning: "passion/madness" },
+      medial:     { roman: "ajnabi", urdu_script: "اجنبی", meaning: "stranger" },
+      final:      { roman: "aaj",    urdu_script: "آج",    meaning: "today" },
+    },
   },
   {
     name: "che",
@@ -84,6 +162,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﭼ", hint: "Che initial: jeem's initial connecting head with three dots below." },
     medial:     { glyph: "ﭽ", hint: "Che medial: small hook form, three dots below." },
     final:      { glyph: "ﭻ", hint: "Che final: deep downward hook, three dots below distinguishing it from jeem." },
+    pronunciation: "sounds like 'ch' in 'chair'",
+    mnemonic: "jeem with three dots below — a fishhook with three pieces of bait",
+    sample_words: {
+      standalone: { roman: "chand",   urdu_script: "چاند", meaning: "moon" },
+      initial:    { roman: "chahat",  urdu_script: "چاہت", meaning: "desire" },
+      medial:     { roman: "bachcha", urdu_script: "بچہ",  meaning: "child" },
+      final:      { roman: "kuch",    urdu_script: "کچھ",  meaning: "some/a little" },
+    },
   },
   {
     name: "hah",
@@ -92,6 +178,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﺣ", hint: "Hah initial: the rounded connecting head, no dot unlike jeem or che." },
     medial:     { glyph: "ﺤ", hint: "Hah medial: curved hook form with no dot — absence of dot distinguishes it from jeem and che." },
     final:      { glyph: "ﺢ", hint: "Hah final: deep hook, no dot, attached to the preceding letter." },
+    pronunciation: "a breathy 'h' from the throat — deeper than English 'h', like fogging a mirror from the back of the throat",
+    mnemonic: "the empty fishhook — jeem with no dot inside, hollow and open",
+    sample_words: {
+      standalone: { roman: "haya",     urdu_script: "حیا",  meaning: "modesty" },
+      initial:    { roman: "hairat",   urdu_script: "حیرت", meaning: "wonder" },
+      medial:     { roman: "mohabbat", urdu_script: "محبت", meaning: "love" },
+      final:      { roman: "rooh",     urdu_script: "روح",  meaning: "soul" },
+    },
   },
   {
     name: "khe",
@@ -100,6 +194,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﺧ", hint: "Khe initial: hah's initial form with one dot above." },
     medial:     { glyph: "ﺨ", hint: "Khe medial: curved hook form with one dot above." },
     final:      { glyph: "ﺦ", hint: "Khe final: deep hook like hah's final, one dot above." },
+    pronunciation: "like 'ch' in Scottish 'loch' — a guttural fricative scraping from the back of the throat",
+    mnemonic: "the marked fishhook — hah with a single dot above, spotting the difference",
+    sample_words: {
+      standalone: { roman: "khushi",   urdu_script: "خوشی",  meaning: "happiness" },
+      initial:    { roman: "khauf",    urdu_script: "خوف",   meaning: "fear" },
+      medial:     { roman: "akhbaar",  urdu_script: "اخبار", meaning: "newspaper" },
+      final:      { roman: "taareekh", urdu_script: "تاریخ", meaning: "history/date" },
+    },
   },
   {
     name: "dal",
@@ -108,6 +210,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﺩ", hint: "Dal at word start looks identical to standalone — it never connects to the following letter." },
     medial:     { glyph: "ﺪ", hint: "Dal in medial position looks like final — the wedge attaches to the preceding letter's line." },
     final:      { glyph: "ﺪ", hint: "Dal final: the angular wedge hangs from the preceding letter's connecting stroke." },
+    pronunciation: "a dental 'd' — tongue touches upper teeth, softer than English 'd'",
+    mnemonic: "a door wedge seen from the side — it opens only one way, never connects forward",
+    sample_words: {
+      standalone: { roman: "dost",    urdu_script: "دوست",  meaning: "friend" },
+      initial:    { roman: "dost",    urdu_script: "دوست",  meaning: "friend" },
+      medial:     { roman: "zindagi", urdu_script: "زندگی", meaning: "life" },
+      final:      { roman: "zindagi", urdu_script: "زندگی", meaning: "life" },
+    },
   },
   {
     name: "ddal",
@@ -116,6 +226,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﮈ", hint: "Ddal at word start looks identical to standalone — non-connector with retroflex mark below." },
     medial:     { glyph: "ﮉ", hint: "Ddal in medial position looks like final — wedge with retroflex mark attaches to preceding letter." },
     final:      { glyph: "ﮉ", hint: "Ddal final: dal's wedge form with the retroflex subscript mark below." },
+    pronunciation: "a retroflex 'd' — curl the tongue tip back; heavier and more resonant than dal",
+    mnemonic: "a dal with a small curl below — the curl tag tells you to curl your tongue back",
+    sample_words: {
+      standalone: { roman: "darr",   urdu_script: "ڈر",    meaning: "fright" },
+      initial:    { roman: "darr",   urdu_script: "ڈر",    meaning: "fright" },
+      medial:     { roman: "thanda", urdu_script: "ٹھنڈا", meaning: "cold" },
+      final:      { roman: "thanda", urdu_script: "ٹھنڈا", meaning: "cold" },
+    },
   },
   {
     name: "zal",
@@ -124,6 +242,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﺫ", hint: "Zal at word start looks identical to standalone — non-connector with dot above." },
     medial:     { glyph: "ﺬ", hint: "Zal in medial position looks like final — the dotted wedge attaches to the preceding letter." },
     final:      { glyph: "ﺬ", hint: "Zal final: dal's final wedge with one dot above, hanging from the preceding letter." },
+    pronunciation: "sounds like 'z' in 'zero' — in standard Urdu merged with zain",
+    mnemonic: "dal wearing a hat — a single dot above the wedge marks the difference",
+    sample_words: {
+      standalone: { roman: "zillat", urdu_script: "ذلت",  meaning: "humiliation" },
+      initial:    { roman: "zillat", urdu_script: "ذلت",  meaning: "humiliation" },
+      medial:     { roman: "azab",   urdu_script: "عذاب", meaning: "torment" },
+      final:      { roman: "azab",   urdu_script: "عذاب", meaning: "torment" },
+    },
   },
   {
     name: "re",
@@ -132,6 +258,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﺭ", hint: "Re at word start looks identical to standalone — it never connects to the following letter." },
     medial:     { glyph: "ﺮ", hint: "Re in medial position looks like final — the hook hangs from the preceding letter's connecting stroke." },
     final:      { glyph: "ﺮ", hint: "Re final: the curved hook hangs down from the preceding letter's connecting stroke." },
+    pronunciation: "a light tapped 'r' — like the 'tt' in American 'butter', or Spanish 'r' in 'para'",
+    mnemonic: "a fishing line dipping below the water — a gentle rightward curve downward",
+    sample_words: {
+      standalone: { roman: "ranj",  urdu_script: "رنج", meaning: "grief" },
+      initial:    { roman: "ranj",  urdu_script: "رنج", meaning: "grief" },
+      medial:     { roman: "sharm", urdu_script: "شرم", meaning: "shame" },
+      final:      { roman: "sharm", urdu_script: "شرم", meaning: "shame" },
+    },
   },
   {
     name: "rre",
@@ -140,6 +274,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﮌ", hint: "Rre at word start looks identical to standalone — non-connector with retroflex mark." },
     medial:     { glyph: "ﮍ", hint: "Rre in medial position looks like final — hook with retroflex mark attaches to preceding letter." },
     final:      { glyph: "ﮍ", hint: "Rre final: re's hooked final form with the distinctive retroflex subscript mark." },
+    pronunciation: "a retroflex 'r' — tongue curls back, a harder more emphatic 'r' than re",
+    mnemonic: "re with a small tag below — the curl mark tells you to curl your tongue back",
+    sample_words: {
+      standalone: { roman: "pahar", urdu_script: "پہاڑ", meaning: "mountain" },
+      initial:    { roman: "pahar", urdu_script: "پہاڑ", meaning: "mountain" },
+      medial:     { roman: "ladka", urdu_script: "لڑکا", meaning: "boy" },
+      final:      { roman: "ladka", urdu_script: "لڑکا", meaning: "boy" },
+    },
   },
   {
     name: "zain",
@@ -148,6 +290,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﺯ", hint: "Zain at word start looks identical to standalone — non-connector, similar to re." },
     medial:     { glyph: "ﺰ", hint: "Zain in medial position looks like final — the extended hook attaches to the preceding letter." },
     final:      { glyph: "ﺰ", hint: "Zain final: the slightly extended downward hook hangs from the preceding letter." },
+    pronunciation: "sounds like 'z' in 'zero'",
+    mnemonic: "re that went a little further — the hook dips just slightly deeper below the line",
+    sample_words: {
+      standalone: { roman: "zindagi", urdu_script: "زندگی", meaning: "life" },
+      initial:    { roman: "zindagi", urdu_script: "زندگی", meaning: "life" },
+      medial:     { roman: "mazaa",   urdu_script: "مزہ",   meaning: "fun" },
+      final:      { roman: "mazaa",   urdu_script: "مزہ",   meaning: "fun" },
+    },
   },
   {
     name: "zhe",
@@ -156,6 +306,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﮊ", hint: "Zhe at word start looks identical to standalone — non-connector with three dots above." },
     medial:     { glyph: "ﮋ", hint: "Zhe in medial position looks like final — hook with three dots above attaches to preceding letter." },
     final:      { glyph: "ﮋ", hint: "Zhe final: zain's final hook with three dots above." },
+    pronunciation: "sounds like 's' in 'measure' or French 'j' in 'bonjour' — a voiced palatal fricative",
+    mnemonic: "zain with three dots above — zain wearing a French hat",
+    sample_words: {
+      standalone: { roman: "zhala", urdu_script: "ژالہ", meaning: "hailstone" },
+      initial:    { roman: "zhala", urdu_script: "ژالہ", meaning: "hailstone" },
+      medial:     { roman: "vazhe", urdu_script: "واژه", meaning: "word (literary)" },
+      final:      { roman: "vazhe", urdu_script: "واژه", meaning: "word (literary)" },
+    },
   },
   {
     name: "seen",
@@ -164,6 +322,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﺳ", hint: "Seen initial: the three teeth extend to the right for connecting, tail not yet formed." },
     medial:     { glyph: "ﺴ", hint: "Seen medial: three small teeth connecting on both sides, compressed in the middle of a word." },
     final:      { glyph: "ﺲ", hint: "Seen final: three teeth with the long descending tail, attached to the preceding letter." },
+    pronunciation: "sounds like 's' in 'sun'",
+    mnemonic: "three tiny waves rolling into a long tail — the written sea",
+    sample_words: {
+      standalone: { roman: "sukoon",  urdu_script: "سکون",  meaning: "peace" },
+      initial:    { roman: "saathi",  urdu_script: "ساتھی", meaning: "companion" },
+      medial:     { roman: "musafir", urdu_script: "مسافر", meaning: "traveller" },
+      final:      { roman: "nafs",    urdu_script: "نفس",   meaning: "soul/self" },
+    },
   },
   {
     name: "sheen",
@@ -172,6 +338,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﺷ", hint: "Sheen initial: seen's initial teeth with three dots above." },
     medial:     { glyph: "ﺸ", hint: "Sheen medial: three teeth with three dots above, connecting on both sides." },
     final:      { glyph: "ﺶ", hint: "Sheen final: seen's final tail form with three dots above." },
+    pronunciation: "sounds like 'sh' in 'ship'",
+    mnemonic: "three waves with three dots above — the sea in a storm, spray flying up",
+    sample_words: {
+      standalone: { roman: "shukr",     urdu_script: "شکر",   meaning: "gratitude" },
+      initial:    { roman: "sharm",     urdu_script: "شرم",   meaning: "shame" },
+      medial:     { roman: "pareshaan", urdu_script: "پریشان", meaning: "worried" },
+      final:      { roman: "khwaish",   urdu_script: "خواہش", meaning: "desire" },
+    },
   },
   {
     name: "sad",
@@ -180,6 +354,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﺻ", hint: "Sad initial: the closed loop extends rightward to connect, tail not yet formed." },
     medial:     { glyph: "ﺼ", hint: "Sad medial: the closed loop sits on the connecting baseline between other letters." },
     final:      { glyph: "ﺺ", hint: "Sad final: the rounded loop with a tail, attached to the preceding letter." },
+    pronunciation: "an emphatic 's' — tongue flat against the palate, giving a heavy resonant quality",
+    mnemonic: "a closed lasso — a rounded loop sealed shut on the right, with a pointed tail",
+    sample_words: {
+      standalone: { roman: "sabr",   urdu_script: "صبر",  meaning: "patience" },
+      initial:    { roman: "sahib",  urdu_script: "صاحب", meaning: "sir/gentleman" },
+      medial:     { roman: "naseeb", urdu_script: "نصیب", meaning: "destiny" },
+      final:      { roman: "khaas",  urdu_script: "خاص",  meaning: "special" },
+    },
   },
   {
     name: "dad",
@@ -188,6 +370,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﺿ", hint: "Dad initial: sad's initial connecting loop with one dot above." },
     medial:     { glyph: "ﻀ", hint: "Dad medial: the loop on the baseline with one dot above." },
     final:      { glyph: "ﺾ", hint: "Dad final: sad's final loop and tail with one dot above." },
+    pronunciation: "historically emphatic 'D'; in modern Urdu typically merged with zal, sounding like 'z'",
+    mnemonic: "sad with a dot above — sad's dotted cousin carrying extra weight",
+    sample_words: {
+      standalone: { roman: "ziddi",  urdu_script: "ضدی",  meaning: "stubborn" },
+      initial:    { roman: "ziddi",  urdu_script: "ضدی",  meaning: "stubborn" },
+      medial:     { roman: "hazoor", urdu_script: "حضور", meaning: "presence/your honour" },
+      final:      { roman: "marz",   urdu_script: "مرض",  meaning: "illness" },
+    },
   },
   {
     name: "tah",
@@ -196,6 +386,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﻃ", hint: "Tah initial: the open loop extends rightward to connect, vertical stroke prominent." },
     medial:     { glyph: "ﻄ", hint: "Tah medial: the open loop and vertical stroke sit on the connecting baseline." },
     final:      { glyph: "ﻂ", hint: "Tah final: the full loop and vertical stroke, attached to the preceding letter." },
+    pronunciation: "an emphatic 't' — tongue flat against the palate, a deeper resonant quality than te",
+    mnemonic: "a lasso on the left with a tall pole rising on the right — a cowboy's tool",
+    sample_words: {
+      standalone: { roman: "toofaan", urdu_script: "طوفان", meaning: "storm" },
+      initial:    { roman: "toofaan", urdu_script: "طوفان", meaning: "storm" },
+      medial:     { roman: "natq",    urdu_script: "نطق",   meaning: "speech/pronunciation" },
+      final:      { roman: "ghalt",   urdu_script: "غلط",   meaning: "wrong/incorrect" },
+    },
   },
   {
     name: "zah",
@@ -204,6 +402,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﻇ", hint: "Zah initial: tah's initial form with one dot above the vertical stroke." },
     medial:     { glyph: "ﻈ", hint: "Zah medial: tah's medial form with one dot above." },
     final:      { glyph: "ﻆ", hint: "Zah final: tah's final form with one dot above the stroke." },
+    pronunciation: "an emphatic 'z' — like tah but voiced; rare in Urdu, mostly Arabic loanwords",
+    mnemonic: "tah with a dot above the pole — tah's dotted sibling",
+    sample_words: {
+      standalone: { roman: "zulm",   urdu_script: "ظلم",  meaning: "oppression" },
+      initial:    { roman: "zulm",   urdu_script: "ظلم",  meaning: "oppression" },
+      medial:     { roman: "nazm",   urdu_script: "نظم",  meaning: "poem" },
+      final:      { roman: "haafiz", urdu_script: "حافظ", meaning: "guardian/memorizer of Quran" },
+    },
   },
   {
     name: "ain",
@@ -212,6 +418,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﻋ", hint: "Ain initial: opens wide to the right to connect, like a cupped hand." },
     medial:     { glyph: "ﻌ", hint: "Ain medial: a compressed angular form on the baseline, connecting on both sides." },
     final:      { glyph: "ﻊ", hint: "Ain final: the open angular form with a downward tail, attached to the preceding letter." },
+    pronunciation: "a voiced pharyngeal — a constriction deep in the throat, like the start of a cough held open",
+    mnemonic: "an angular cup opening to the left — it holds sound in the depths of the throat",
+    sample_words: {
+      standalone: { roman: "izzat",   urdu_script: "عزت",  meaning: "honour" },
+      initial:    { roman: "aurat",   urdu_script: "عورت", meaning: "woman" },
+      medial:     { roman: "taajjub", urdu_script: "تعجب", meaning: "surprise" },
+      final:      { roman: "shama",   urdu_script: "شمع",  meaning: "candle" },
+    },
   },
   {
     name: "ghain",
@@ -220,6 +434,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﻏ", hint: "Ghain initial: ain's initial open form with one dot above." },
     medial:     { glyph: "ﻐ", hint: "Ghain medial: ain's medial compressed form with one dot above." },
     final:      { glyph: "ﻎ", hint: "Ghain final: ain's final angular tail form with one dot above." },
+    pronunciation: "a voiced guttural — like gargling softly, the French 'r', or a soft 'G' from the back of the throat",
+    mnemonic: "ain with a dot above — the dot marks the heavier, voiced guttural version",
+    sample_words: {
+      standalone: { roman: "ghairat",  urdu_script: "غیرت", meaning: "self-respect" },
+      initial:    { roman: "gussa",    urdu_script: "غصہ",  meaning: "anger" },
+      medial:     { roman: "naghma",   urdu_script: "نغمہ", meaning: "melody" },
+      final:      { roman: "mubaligh", urdu_script: "مبلغ", meaning: "preacher" },
+    },
   },
   {
     name: "fa",
@@ -228,6 +450,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﻓ", hint: "Fa initial: the round head extends to the right to connect, dot above." },
     medial:     { glyph: "ﻔ", hint: "Fa medial: the round head sits on the baseline connecting on both sides, dot above." },
     final:      { glyph: "ﻒ", hint: "Fa final: the round loop with dot above, attached to the preceding letter." },
+    pronunciation: "sounds like 'f' in 'fan'",
+    mnemonic: "a round head looking forward with a dot above — like a person with a spot on their forehead",
+    sample_words: {
+      standalone: { roman: "fikr",   urdu_script: "فکر",   meaning: "worry" },
+      initial:    { roman: "fakhr",  urdu_script: "فخر",   meaning: "pride" },
+      medial:     { roman: "safeer", urdu_script: "سفیر",  meaning: "ambassador" },
+      final:      { roman: "taklif", urdu_script: "تکلیف", meaning: "trouble" },
+    },
   },
   {
     name: "qaf",
@@ -236,6 +466,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﻗ", hint: "Qaf initial: the bowl connects to the right, two dots above." },
     medial:     { glyph: "ﻘ", hint: "Qaf medial: small connecting form with two dots above." },
     final:      { glyph: "ﻖ", hint: "Qaf final: the deep bowl with two dots above, attached to the preceding letter." },
+    pronunciation: "a 'k' produced from the very back of the throat, near the uvula — deeper than kaf",
+    mnemonic: "a deep bowl with two eyes — two dots peering up at you from inside the cup",
+    sample_words: {
+      standalone: { roman: "qismat", urdu_script: "قسمت", meaning: "fate" },
+      initial:    { roman: "qasam",  urdu_script: "قسم",  meaning: "oath" },
+      medial:     { roman: "yaqeen", urdu_script: "یقین", meaning: "certainty" },
+      final:      { roman: "ishq",   urdu_script: "عشق",  meaning: "passionate love" },
+    },
   },
   {
     name: "kaf",
@@ -244,6 +482,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﮐ", hint: "Kaf initial: the diagonal mark is visible as the body opens rightward to connect." },
     medial:     { glyph: "ﮑ", hint: "Kaf medial: flat connecting stroke with the characteristic diagonal mark above." },
     final:      { glyph: "ﮏ", hint: "Kaf final: the diagonal mark sits over a closed body with a left-curling tail." },
+    pronunciation: "sounds like 'k' in 'keep'",
+    mnemonic: "a diagonal slash inside a curved shell — like an initial scrawled inside a locket",
+    sample_words: {
+      standalone: { roman: "kasak",  urdu_script: "کسک",  meaning: "pang" },
+      initial:    { roman: "kal",    urdu_script: "کل",   meaning: "yesterday/tomorrow" },
+      medial:     { roman: "sukoon", urdu_script: "سکون", meaning: "peace" },
+      final:      { roman: "shak",   urdu_script: "شک",   meaning: "doubt" },
+    },
   },
   {
     name: "gaf",
@@ -252,6 +498,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﮔ", hint: "Gaf initial: kaf's initial connecting form with two diagonal marks above." },
     medial:     { glyph: "ﮕ", hint: "Gaf medial: flat connecting stroke with two diagonal marks above." },
     final:      { glyph: "ﮓ", hint: "Gaf final: kaf's final bowl and tail form with two diagonal marks above." },
+    pronunciation: "sounds like 'g' in 'go'",
+    mnemonic: "kaf with a double diagonal stroke — twice the mark for twice the voice",
+    sample_words: {
+      standalone: { roman: "garmi", urdu_script: "گرمی", meaning: "heat/summer" },
+      initial:    { roman: "garmi", urdu_script: "گرمی", meaning: "heat/summer" },
+      medial:     { roman: "lagan", urdu_script: "لگن",  meaning: "dedication" },
+      final:      { roman: "rang",  urdu_script: "رنگ",  meaning: "color" },
+    },
   },
   {
     name: "lam",
@@ -260,6 +514,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﻟ", hint: "Lam initial: rises tall and the baseline extends rightward to connect forward." },
     medial:     { glyph: "ﻠ", hint: "Lam medial: a vertical rise from the connecting baseline on both sides." },
     final:      { glyph: "ﻞ", hint: "Lam final: tall hook at top, connected from the right, tail curling down-left." },
+    pronunciation: "sounds like 'l' in 'light'",
+    mnemonic: "a tall walking stick — rises high then curves down and to the left",
+    sample_words: {
+      standalone: { roman: "lagan",  urdu_script: "لگن",   meaning: "dedication" },
+      initial:    { roman: "lutf",   urdu_script: "لطف",   meaning: "pleasure" },
+      medial:     { roman: "taklif", urdu_script: "تکلیف", meaning: "trouble" },
+      final:      { roman: "sahil",  urdu_script: "ساحل",  meaning: "shore/coast" },
+    },
   },
   {
     name: "meem",
@@ -268,6 +530,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﻣ", hint: "Meem initial: the round head connects rightward, tail tucked inward." },
     medial:     { glyph: "ﻤ", hint: "Meem medial: a small round head sitting atop the connecting baseline." },
     final:      { glyph: "ﻢ", hint: "Meem final: the round head at the end, tail sweeping down-left." },
+    pronunciation: "sounds like 'm' in 'moon'",
+    mnemonic: "a closed knot on the left with a long tail — a small 'm' compressed into a loop",
+    sample_words: {
+      standalone: { roman: "maa",      urdu_script: "ماں",  meaning: "mother" },
+      initial:    { roman: "mohabbat", urdu_script: "محبت", meaning: "love" },
+      medial:     { roman: "tamanna",  urdu_script: "تمنا", meaning: "wish" },
+      final:      { roman: "gham",     urdu_script: "غم",   meaning: "sorrow" },
+    },
   },
   {
     name: "noon",
@@ -276,6 +546,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﻧ", hint: "Noon initial: resembles be's initial but the single dot sits above the stroke." },
     medial:     { glyph: "ﻨ", hint: "Noon medial: tiny connecting tooth with the dot above distinguishing it from be." },
     final:      { glyph: "ﻦ", hint: "Noon final: a broad sweeping curve to the left, one dot above." },
+    pronunciation: "sounds like 'n' in 'noon'",
+    mnemonic: "a deep bowl with a dot floating above it — like a period hovering above a cup",
+    sample_words: {
+      standalone: { roman: "nadi",   urdu_script: "ندی",  meaning: "stream" },
+      initial:    { roman: "naseeb", urdu_script: "نصیب", meaning: "destiny" },
+      medial:     { roman: "junoon", urdu_script: "جنون", meaning: "passion/madness" },
+      final:      { roman: "yaqeen", urdu_script: "یقین", meaning: "certainty" },
+    },
   },
   {
     name: "noon-ghunna",
@@ -284,6 +562,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﮞ", hint: "Noon ghunna at word start looks identical to standalone — it does not connect to the following letter." },
     medial:     { glyph: "ﮟ", hint: "Noon ghunna in medial position looks like final — the dotless bowl attaches to the preceding letter." },
     final:      { glyph: "ﮟ", hint: "Noon ghunna final: a dotless noon bowl attached to the preceding letter, indicating the nasal sound." },
+    pronunciation: "a nasal hum — the sound dissolves into the nose with no hard consonant at the end",
+    mnemonic: "noon without its dot — the sound fades into a nasal resonance, the dot fell away",
+    sample_words: {
+      standalone: { roman: "maa",  urdu_script: "ماں", meaning: "mother" },
+      initial:    { roman: "maa",  urdu_script: "ماں", meaning: "mother" },
+      medial:     { roman: "hain", urdu_script: "ہیں", meaning: "are (plural)" },
+      final:      { roman: "hain", urdu_script: "ہیں", meaning: "are (plural)" },
+    },
   },
   {
     name: "wao",
@@ -292,6 +578,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﻭ", hint: "Wao at word start looks identical to standalone — it never connects to the following letter." },
     medial:     { glyph: "ﻮ", hint: "Wao in medial position looks like final — the teardrop hangs from the preceding letter's connecting stroke." },
     final:      { glyph: "ﻮ", hint: "Wao final: the teardrop loop hangs from the preceding letter's connecting stroke, tail below." },
+    pronunciation: "can sound like 'w', 'v', long 'oo', or 'o' depending on context and dialect",
+    mnemonic: "a teardrop with a tail — round on top, dripping downward to the left",
+    sample_words: {
+      standalone: { roman: "wafa", urdu_script: "وفا", meaning: "loyalty" },
+      initial:    { roman: "wafa", urdu_script: "وفا", meaning: "loyalty" },
+      medial:     { roman: "hawa", urdu_script: "ہوا", meaning: "wind/air" },
+      final:      { roman: "hawa", urdu_script: "ہوا", meaning: "wind/air" },
+    },
   },
   {
     name: "he",
@@ -300,6 +594,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﮬ", hint: "He initial: opens to the right to connect forward, the loop is visible." },
     medial:     { glyph: "ﮭ", hint: "He medial: a small figure-eight or knot shape connecting on both sides." },
     final:      { glyph: "ﮫ", hint: "He final: a rounded closed loop attached to the preceding letter." },
+    pronunciation: "a gentle 'h' as in 'hello' — softer than hah (ح), produced at the mouth not the throat",
+    mnemonic: "a soap bubble — a closed round loop that breathes open just enough",
+    sample_words: {
+      standalone: { roman: "hawa",   urdu_script: "ہوا",  meaning: "wind/air" },
+      initial:    { roman: "himmat", urdu_script: "ہمت",  meaning: "courage" },
+      medial:     { roman: "bahaar", urdu_script: "بہار", meaning: "spring season" },
+      final:      { roman: "gila",   urdu_script: "گلہ",  meaning: "grievance" },
+    },
   },
   {
     name: "ye",
@@ -308,6 +610,14 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﯾ", hint: "Ye initial: a short tooth-like connecting stroke, two dots below." },
     medial:     { glyph: "ﯿ", hint: "Ye medial: tiny connecting tooth with two dots below." },
     final:      { glyph: "ﯽ", hint: "Ye final: a long sweeping tail to the left, two dots below." },
+    pronunciation: "sounds like 'y' in 'yes' at word start; long 'ee' elsewhere",
+    mnemonic: "two feet under a shallow arch — the two dots below are the feet of the letter",
+    sample_words: {
+      standalone: { roman: "yaad",   urdu_script: "یاد",   meaning: "remembrance" },
+      initial:    { roman: "yaqeen", urdu_script: "یقین",  meaning: "certainty" },
+      medial:     { roman: "taklif", urdu_script: "تکلیف", meaning: "trouble" },
+      final:      { roman: "khushi", urdu_script: "خوشی",  meaning: "happiness" },
+    },
   },
   {
     name: "bari-ye",
@@ -316,5 +626,13 @@ export const UrduLetters: UrduLetter[] = [
     initial:    { glyph: "ﮮ", hint: "Bari ye at word start looks identical to standalone — it does not connect to the following letter." },
     medial:     { glyph: "ﮯ", hint: "Bari ye in medial position looks like final — the swooping hook attaches to the preceding letter." },
     final:      { glyph: "ﮯ", hint: "Bari ye final: the long sweeping downward hook attaches to the preceding letter, commonly seen at word ends." },
+    pronunciation: "a long 'ay' (as in 'day') or 'ee' sound — used almost exclusively at word end",
+    mnemonic: "a long swooping tail — like a river diving off a cliff into the depths",
+    sample_words: {
+      standalone: { roman: "mere", urdu_script: "میرے", meaning: "my/mine" },
+      initial:    { roman: "mere", urdu_script: "میرے", meaning: "my/mine" },
+      medial:     { roman: "aane", urdu_script: "آنے",  meaning: "to come/coming" },
+      final:      { roman: "aane", urdu_script: "آنے",  meaning: "to come/coming" },
+    },
   },
 ];
