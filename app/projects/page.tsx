@@ -17,6 +17,14 @@ const PROJECTS = [
       "Plan your retirement with tax modeling, asset allocation, and year-by-year projections.",
   },
   {
+    href: "/projects/synth-annuity",
+    emoji: "🏦",
+    emojiClass: "",
+    title: "SynthAnnuity – DIY Retirement Architect",
+    description:
+      "Build your own annuity with a US Treasury bond ladder. No fees, no fine print — just guaranteed income.",
+  },
+  {
     href: "/projects/coin-toss-casino",
     emoji: "🎰",
     emojiClass: "",
