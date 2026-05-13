@@ -9,6 +9,13 @@ import {
 
 const MODES = [
   {
+    href: "/urdu/ready-reckoner",
+    emoji: "📋",
+    title: "Ready Reckoner",
+    description:
+      "Browse all Urdu characters in Nastaliq and Naskh with example words.",
+  },
+  {
     href: "/urdu/word",
     emoji: "🔤",
     title: "Word Lookup",
