@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:urdu-characters": "npx tsx db/seed-urdu-characters.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.1",

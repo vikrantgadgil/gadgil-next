@@ -8,6 +8,7 @@ const ADMIN_EMAIL = "vikrant.swapna@gmail.com";
 
 const TABS = [
   { href: "/urdu/word", label: "Word Lookup" },
+  { href: "/urdu/ready-reckoner", label: "Ready Reckoner" },
   { href: "/urdu/quiz/letter", label: "Letter Quiz" },
   { href: "/urdu/quiz/word", label: "Word Quiz" },
   { href: "/urdu/words", label: "My Words" },

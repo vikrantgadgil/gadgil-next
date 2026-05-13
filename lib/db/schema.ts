@@ -66,6 +66,19 @@ export const verificationTokens = pgTable(
 );
 
 // ---------------------------------------------------------------------------
+// Urdu Characters table
+// ---------------------------------------------------------------------------
+
+export { urduCharacters } from "./schema/urdu-characters";
+export type {
+  UrduCharacter,
+  NewUrduCharacter,
+  UrduCharacterForms,
+  UrduCharacterExamples,
+  UrduCharacterExample,
+} from "./schema/urdu-characters";
+
+// ---------------------------------------------------------------------------
 // App-specific tables
 // ---------------------------------------------------------------------------
 
