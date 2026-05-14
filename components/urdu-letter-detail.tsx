@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import type { UrduLetter } from "@/lib/urdu/letters"
-
 type Props = {
   letter: UrduLetter
   open: boolean
@@ -31,13 +30,15 @@ export function UrduLetterDetail({ letter, open, onClose }: Props) {
         {/* ── Header ────────────────────────────────────────── */}
         <DialogHeader>
           <div className="flex items-center gap-4">
-            <p
-              className="text-5xl font-[family-name:var(--font-nastaliq)] leading-none"
-              dir="rtl"
-              lang="ur"
-            >
-              {letter.standalone.glyph}
-            </p>
+            <div className="flex items-center gap-2">
+              <p
+                className="text-5xl font-[family-name:var(--font-nastaliq)] leading-none"
+                dir="rtl"
+                lang="ur"
+              >
+                {letter.standalone.glyph}
+              </p>
+            </div>
             <div>
               <DialogTitle className="capitalize">{letter.name}</DialogTitle>
               <p className="mt-0.5 text-sm text-slate-500">All positional forms</p>
@@ -70,13 +71,15 @@ export function UrduLetterDetail({ letter, open, onClose }: Props) {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <p
-                          className="text-4xl font-[family-name:var(--font-nastaliq)] leading-none"
-                          dir="rtl"
-                          lang="ur"
-                        >
-                          {formData.glyph}
-                        </p>
+                        <div className="flex flex-col items-center gap-1">
+                          <p
+                            className="text-4xl font-[family-name:var(--font-nastaliq)] leading-none"
+                            dir="rtl"
+                            lang="ur"
+                          >
+                            {formData.glyph}
+                          </p>
+                        </div>
                       </td>
                       <td className="px-4 py-3 text-center">
                         <p
@@ -88,30 +91,32 @@ export function UrduLetterDetail({ letter, open, onClose }: Props) {
                         </p>
                       </td>
                       <td className="px-4 py-3">
-                        <a
-                          href={`/urdu/word?q=${encodeURIComponent(word.roman)}`}
-                          className="group inline-block rounded-lg px-2 py-1.5 transition-colors hover:bg-slate-50"
-                        >
-                          <div className="flex items-center gap-3" dir="rtl">
-                            <p
-                              className="text-xl font-[family-name:var(--font-nastaliq)] leading-none"
-                              lang="ur"
-                            >
-                              {word.urdu_script}
+                        <div className="flex items-start gap-2">
+                          <a
+                            href={`/urdu/word?q=${encodeURIComponent(word.roman)}`}
+                            className="group inline-block rounded-lg px-2 py-1.5 transition-colors hover:bg-slate-50 flex-1"
+                          >
+                            <div className="flex items-center gap-3" dir="rtl">
+                              <p
+                                className="text-xl font-[family-name:var(--font-nastaliq)] leading-none"
+                                lang="ur"
+                              >
+                                {word.urdu_script}
+                              </p>
+                              <p
+                                className="text-xl font-[family-name:var(--font-naskh)] leading-none text-slate-400"
+                                lang="ur"
+                              >
+                                {word.urdu_script}
+                              </p>
+                            </div>
+                            <p className="mt-1 font-mono text-xs text-slate-600">{word.roman}</p>
+                            <p className="text-xs text-slate-400">{word.meaning}</p>
+                            <p className="mt-0.5 text-xs text-slate-300 transition-colors group-hover:text-slate-500">
+                              See full breakdown →
                             </p>
-                            <p
-                              className="text-xl font-[family-name:var(--font-naskh)] leading-none text-slate-400"
-                              lang="ur"
-                            >
-                              {word.urdu_script}
-                            </p>
-                          </div>
-                          <p className="mt-1 font-mono text-xs text-slate-600">{word.roman}</p>
-                          <p className="text-xs text-slate-400">{word.meaning}</p>
-                          <p className="mt-0.5 text-xs text-slate-300 transition-colors group-hover:text-slate-500">
-                            See full breakdown →
-                          </p>
-                        </a>
+                          </a>
+                        </div>
                       </td>
                     </tr>
                   )
@@ -139,7 +144,9 @@ export function UrduLetterDetail({ letter, open, onClose }: Props) {
                       >
                         {formData.glyph}
                       </p>
-                      <span className="text-xs text-slate-400">Nastaliq</span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-slate-400">Nastaliq</span>
+                      </div>
                     </div>
                     <div className="h-8 w-px bg-slate-200" />
                     <div className="flex flex-col items-center gap-1">
@@ -153,30 +160,32 @@ export function UrduLetterDetail({ letter, open, onClose }: Props) {
                       <span className="text-xs text-slate-400">Naskh</span>
                     </div>
                   </div>
-                  <a
-                    href={`/urdu/word?q=${encodeURIComponent(word.roman)}`}
-                    className="flex items-start gap-3 rounded-lg bg-slate-50 px-3 py-2.5 transition-colors hover:bg-slate-100"
-                  >
-                    <div dir="rtl" className="flex gap-2 shrink-0">
-                      <p
-                        className="text-xl font-[family-name:var(--font-nastaliq)] leading-none"
-                        lang="ur"
-                      >
-                        {word.urdu_script}
-                      </p>
-                      <p
-                        className="text-xl font-[family-name:var(--font-naskh)] leading-none text-slate-400"
-                        lang="ur"
-                      >
-                        {word.urdu_script}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="font-mono text-xs text-slate-600">{word.roman}</p>
-                      <p className="text-xs text-slate-400">{word.meaning}</p>
-                      <p className="text-xs text-slate-300">See full breakdown →</p>
-                    </div>
-                  </a>
+                  <div className="flex items-start gap-2">
+                    <a
+                      href={`/urdu/word?q=${encodeURIComponent(word.roman)}`}
+                      className="flex items-start gap-3 rounded-lg bg-slate-50 px-3 py-2.5 transition-colors hover:bg-slate-100 flex-1"
+                    >
+                      <div dir="rtl" className="flex gap-2 shrink-0">
+                        <p
+                          className="text-xl font-[family-name:var(--font-nastaliq)] leading-none"
+                          lang="ur"
+                        >
+                          {word.urdu_script}
+                        </p>
+                        <p
+                          className="text-xl font-[family-name:var(--font-naskh)] leading-none text-slate-400"
+                          lang="ur"
+                        >
+                          {word.urdu_script}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="font-mono text-xs text-slate-600">{word.roman}</p>
+                        <p className="text-xs text-slate-400">{word.meaning}</p>
+                        <p className="text-xs text-slate-300">See full breakdown →</p>
+                      </div>
+                    </a>
+                  </div>
                 </div>
               )
             })}

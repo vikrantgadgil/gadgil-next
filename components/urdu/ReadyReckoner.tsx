@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/dialog";
 import type { UrduCharacter } from "@/lib/data/urdu-characters";
 import { URDU_CHARACTERS } from "@/lib/data/urdu-characters";
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -299,31 +298,33 @@ export function ReadyReckoner({ initialCharacters }: Props) {
                         : false;
                     return (
                       <TableCell key={form} className="text-center">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleFormClick(char.id, form);
-                          }}
-                          className={`inline-flex items-center justify-center rounded-lg p-2 transition-colors hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-300 ${
-                            isSelected && selectedForm === form
-                              ? "ring-2 ring-slate-400"
-                              : ""
-                          }`}
-                          aria-label={`${char.name} ${FORM_LABELS[form]} form`}
-                        >
-                          {isSame ? (
-                            <span className="text-xs text-slate-300">—</span>
-                          ) : (
-                            <p
-                              className="text-4xl leading-none"
-                              style={{ fontFamily: fontFamily }}
-                              dir="rtl"
-                              lang="ur"
-                            >
-                              {glyph}
-                            </p>
-                          )}
-                        </button>
+                        <div className="flex flex-col items-center gap-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleFormClick(char.id, form);
+                            }}
+                            className={`inline-flex items-center justify-center rounded-lg p-2 transition-colors hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-300 ${
+                              isSelected && selectedForm === form
+                                ? "ring-2 ring-slate-400"
+                                : ""
+                            }`}
+                            aria-label={`${char.name} ${FORM_LABELS[form]} form`}
+                          >
+                            {isSame ? (
+                              <span className="text-xs text-slate-300">—</span>
+                            ) : (
+                              <p
+                                className="text-4xl leading-none"
+                                style={{ fontFamily: fontFamily }}
+                                dir="rtl"
+                                lang="ur"
+                              >
+                                {glyph}
+                              </p>
+                            )}
+                          </button>
+                        </div>
                       </TableCell>
                     );
                   })}
@@ -456,7 +457,7 @@ export function ReadyReckoner({ initialCharacters }: Props) {
                   {selectedGlyph}
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
                 <span className="rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-medium text-slate-600">
                   Nastaliq
                 </span>
@@ -527,36 +528,37 @@ export function ReadyReckoner({ initialCharacters }: Props) {
                   const glyph = selectedCharacter?.forms[form] ?? "";
                   const isActive = form === selectedForm;
                   return (
-                    <button
-                      key={form}
-                      onClick={() => {
-                        setSelectedForm(form);
-                        updateUrl(
-                          selectedId,
-                          form,
-                          activeFont,
-                        );
-                      }}
-                      className={`flex flex-col items-center gap-1.5 rounded-lg border p-3 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-300 ${
-                        isActive
-                          ? "border-slate-400 bg-slate-50 ring-1 ring-slate-300"
-                          : "border-slate-200 hover:bg-slate-50"
-                      }`}
-                      aria-label={`${selectedCharacter?.name} ${FORM_LABELS[form]} form`}
-                      aria-current={isActive ? "true" : undefined}
-                    >
-                      <p
-                        className="text-3xl leading-none"
-                        style={{ fontFamily: fontFamily }}
-                        dir="rtl"
-                        lang="ur"
+                    <div key={form} className="flex flex-col items-center gap-1">
+                      <button
+                        onClick={() => {
+                          setSelectedForm(form);
+                          updateUrl(
+                            selectedId,
+                            form,
+                            activeFont,
+                          );
+                        }}
+                        className={`flex flex-col items-center gap-1.5 rounded-lg border p-3 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-300 ${
+                          isActive
+                            ? "border-slate-400 bg-slate-50 ring-1 ring-slate-300"
+                            : "border-slate-200 hover:bg-slate-50"
+                        }`}
+                        aria-label={`${selectedCharacter?.name} ${FORM_LABELS[form]} form`}
+                        aria-current={isActive ? "true" : undefined}
                       >
-                        {glyph}
-                      </p>
-                      <span className="text-[10px] font-medium text-slate-400">
-                        {FORM_LABELS[form]}
-                      </span>
-                    </button>
+                        <p
+                          className="text-3xl leading-none"
+                          style={{ fontFamily: fontFamily }}
+                          dir="rtl"
+                          lang="ur"
+                        >
+                          {glyph}
+                        </p>
+                        <span className="text-[10px] font-medium text-slate-400">
+                          {FORM_LABELS[form]}
+                        </span>
+                      </button>
+                    </div>
                   );
                 })}
               </div>

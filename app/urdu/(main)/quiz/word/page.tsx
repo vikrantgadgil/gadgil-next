@@ -301,7 +301,7 @@ export default function WordQuizPage() {
             </div>
 
             {/* Word card */}
-            <div className="flex items-center justify-center rounded-3xl border border-slate-200 bg-white py-10 shadow-sm">
+            <div className="flex flex-col items-center gap-3 rounded-3xl border border-slate-200 bg-white py-10 shadow-sm">
               <p
                 className="select-none text-6xl font-[family-name:var(--font-nastaliq)] leading-none"
                 dir="rtl"
@@ -382,7 +382,9 @@ export default function WordQuizPage() {
                       <p className="text-3xl font-[family-name:var(--font-nastaliq)] leading-none" dir="rtl" lang="ur">
                         {question.urdu_script}
                       </p>
-                      <span className="text-xs text-slate-400">Nastaliq</span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-slate-400">Nastaliq</span>
+                      </div>
                     </div>
                     <div className="h-8 w-px bg-slate-200" />
                     <div className="flex flex-col items-center gap-1">

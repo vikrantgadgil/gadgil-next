@@ -156,7 +156,7 @@ export default function LetterQuizPage() {
             </div>
 
             {/* Letter card */}
-            <div className="flex items-center justify-center rounded-3xl border border-slate-200 bg-white py-12 shadow-sm">
+            <div className="flex flex-col items-center gap-3 rounded-3xl border border-slate-200 bg-white py-12 shadow-sm">
               <p
                 className="select-none text-8xl font-[family-name:var(--font-nastaliq)] leading-none"
                 dir="rtl"
