@@ -5,8 +5,8 @@ export async function Nav() {
   const session = await auth();
 
   return (
-    <header className="border-b border-slate-100 bg-white">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
+    <header className="border-b border-slate-200/70 bg-[#faf8f5]">
+      <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3.5">
         <Link
           href="/"
           className="text-sm font-medium text-slate-700 hover:text-slate-900"
@@ -14,14 +14,26 @@ export async function Nav() {
           Vikrant Gadgil
         </Link>
 
-        <div className="flex items-center gap-4">
+        <nav className="flex items-center gap-6">
           <Link
             href="/projects"
             className="text-sm text-slate-500 hover:text-slate-800 transition-colors"
           >
             Projects
           </Link>
-        </div>
+          <Link
+            href="/poetry"
+            className="text-sm text-slate-500 hover:text-slate-800 transition-colors"
+          >
+            Poetry
+          </Link>
+          <Link
+            href="/writing"
+            className="text-sm text-slate-500 hover:text-slate-800 transition-colors"
+          >
+            Writing
+          </Link>
+        </nav>
 
         <div className="flex items-center gap-3">
           {session?.user ? (
