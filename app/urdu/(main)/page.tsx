@@ -34,9 +34,17 @@ const MODES = [
     emoji: "📖",
     title: "Word Quiz",
     description:
-      "See an Urdu word and identify it by its length and meaning.",
+      "See an Urdu word and type its Roman Urdu transliteration.",
+  },
+  {
+    href: "/urdu/quiz/sentence",
+    emoji: "📝",
+    title: "Sentence Quiz",
+    description:
+      "Read Urdu sentences and type them in Roman Urdu.",
   },
 ] as const;
+
 
 export default function UrduHomePage() {
   return (
