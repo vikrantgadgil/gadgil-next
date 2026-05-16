@@ -78,17 +78,14 @@ export default function WordQuizPage() {
     const pool = available.length > 0 ? available : words;
     const word = pool[Math.floor(Math.random() * pool.length)];
 
-    const question_type = word.roman.length <= 4 ? "meaning" : "spelling";
-    const correct_answer =
-      question_type === "meaning"
-        ? word.meaning.toLowerCase()
-        : word.roman.toLowerCase();
+    // Always ask for Roman Urdu transliteration
+    const correct_answer = word.roman.toLowerCase();
 
     setQuestion({
       urdu_script: word.urduScript,
       roman: word.roman,
       meaning: word.meaning,
-      question_type,
+      question_type: "spelling",
       correct_answer,
       from_cache: false,
     });
@@ -201,11 +198,6 @@ export default function WordQuizPage() {
 
   const inputDisabled = checking || hasAnswered || loadingQuestion;
 
-  const hintText =
-    question?.question_type === "meaning"
-      ? "What does this word mean in English?"
-      : "How do you spell this word in Roman Urdu?";
-
   return (
     <main className="bg-slate-50 p-6 sm:p-10">
       <div className="mx-auto max-w-xl space-y-6">
@@ -215,7 +207,7 @@ export default function WordQuizPage() {
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Word Quiz</h1>
             <p className="mt-0.5 text-sm text-slate-500">
-              Answer questions about Urdu words
+              Practice reading Urdu words
             </p>
           </div>
           <div className="shrink-0 rounded-xl bg-white px-4 py-2 text-sm shadow-sm ring-1 ring-slate-200">
@@ -293,13 +285,6 @@ export default function WordQuizPage() {
         {/* ── Question ───────────────────────────────────────── */}
         {question && !loadingQuestion && (
           <>
-            {/* Question type badge */}
-            <div>
-              <span className="inline-block rounded-full bg-slate-200 px-3 py-0.5 text-xs font-semibold uppercase tracking-wider text-slate-600">
-                {question.question_type === "meaning" ? "Meaning" : "Spelling"}
-              </span>
-            </div>
-
             {/* Word card */}
             <div className="flex flex-col items-center gap-3 rounded-3xl border border-slate-200 bg-white py-10 shadow-sm">
               <p
@@ -311,9 +296,9 @@ export default function WordQuizPage() {
               </p>
             </div>
 
-            {/* Hint */}
+            {/* Instruction */}
             <p className="rounded-xl bg-slate-100 px-4 py-2.5 text-sm text-slate-600">
-              {hintText}
+              Type the Roman Urdu for this word (not the English meaning)
             </p>
 
             {/* Input + Check */}
@@ -322,11 +307,7 @@ export default function WordQuizPage() {
                 type="text"
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
-                placeholder={
-                  question.question_type === "meaning"
-                    ? "Type the English meaning..."
-                    : "Type the Roman spelling..."
-                }
+                placeholder='e.g. "kitab", "qalam", "dost"'
                 disabled={inputDisabled}
                 autoFocus
                 className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm placeholder-slate-400 shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200 disabled:opacity-50"

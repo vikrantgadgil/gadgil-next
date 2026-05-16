@@ -22,11 +22,8 @@ export async function GET(request: Request) {
   const pool = candidates.length > 0 ? candidates : UrduWordBank;
   const word = pool[Math.floor(Math.random() * pool.length)];
 
-  const question_type = word.roman.length <= 4 ? "meaning" : "spelling";
-  const correct_answer =
-    question_type === "meaning"
-      ? word.meaning.toLowerCase()
-      : word.roman.toLowerCase();
+  // Always ask for Roman Urdu transliteration, never English meaning
+  const correct_answer = word.roman.toLowerCase();
 
   const [cached] = await db
     .select()
@@ -38,7 +35,7 @@ export async function GET(request: Request) {
     roman: word.roman,
     urdu_script: word.urdu_script,
     meaning: word.meaning,
-    question_type,
+    question_type: "spelling",
     correct_answer,
     from_cache: !!cached,
   });

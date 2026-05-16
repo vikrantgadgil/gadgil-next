@@ -1,26 +1,7 @@
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { urduQuizHistory } from "@/lib/db/schema";
-
-const ALTERNATES: Record<string, string[]> = {
-  alef:  ["alif", "a"],
-  be:    ["ba", "b"],
-  pe:    ["p"],
-  te:    ["ta", "t"],
-  nun:   ["noon", "n"],
-  meem:  ["mim", "m"],
-  lam:   ["l"],
-  kaf:   ["k"],
-  re:    ["ra", "r"],
-  wao:   ["waw", "vao", "w"],
-};
-
-function isAccepted(input: string, canonical: string, bodyAlternates: string[]): boolean {
-  const norm = input.toLowerCase().trim();
-  if (norm === canonical) return true;
-  if (bodyAlternates.map((a) => a.toLowerCase().trim()).includes(norm)) return true;
-  return (ALTERNATES[canonical] ?? []).includes(norm);
-}
+import { checkRomanUrduAnswer } from "@/lib/urdu/normalize";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -44,10 +25,16 @@ export async function POST(request: Request) {
   const letter_name = correct_answer;
   const position = question.split(":")[0].trim();
 
-  const is_correct = isAccepted(roman_answer, correct_answer, alternates ?? []);
+  const { isCorrect: is_correct, matchedVariant } = checkRomanUrduAnswer(
+    roman_answer,
+    correct_answer,
+    alternates ?? []
+  );
 
   const feedback = is_correct
-    ? `Correct! That is ${letter_name} in ${position} form.`
+    ? matchedVariant && matchedVariant !== correct_answer
+      ? `Accepted. Common Roman Urdu spelling: ${roman_answer}. Standard form: ${correct_answer}.`
+      : `Correct! That is ${letter_name} in ${position} form.`
     : `Not quite. That is ${letter_name} in ${position} form.`;
 
   await db.insert(urduQuizHistory).values({

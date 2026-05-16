@@ -45,7 +45,19 @@ export const UrduLetters: UrduLetter[] = [
   },
   {
     name: "alef-madda",
-    alternates: ["alef maddah", "aa", "a"],
+    alternates: [
+      "alif madda",
+      "alif madd",
+      "alif maddah",
+      "alif mad",
+      "alef madda",
+      "alef-madda",
+      "alif-madda",
+      "alif with madda",
+      "alef with madda",
+      "aa",
+      "a",
+    ],
     standalone: { glyph: "ﺁ", hint: "Alef with a wavy madda mark above it, in isolation." },
     initial:    { glyph: "ﺁ", hint: "Alef madda at word start looks identical to standalone — it does not connect forward." },
     medial:     { glyph: "ﺂ", hint: "Alef madda in medial position looks like final — attaches to the preceding letter but not the following." },
@@ -205,7 +217,7 @@ export const UrduLetters: UrduLetter[] = [
   },
   {
     name: "dal",
-    alternates: ["daal", "d"],
+    alternates: ["daal", "d", "dhal"],
     standalone: { glyph: "ﺩ", hint: "Dal standalone: a small angular wedge shape, open on the right." },
     initial:    { glyph: "ﺩ", hint: "Dal at word start looks identical to standalone — it never connects to the following letter." },
     medial:     { glyph: "ﺪ", hint: "Dal in medial position looks like final — the wedge attaches to the preceding letter's line." },
@@ -237,7 +249,7 @@ export const UrduLetters: UrduLetter[] = [
   },
   {
     name: "zal",
-    alternates: ["zaal", "z", "dh"],
+    alternates: ["zaal", "z", "dh", "dhal"],
     standalone: { glyph: "ﺫ", hint: "Zal standalone: like dal but with a single dot above the wedge." },
     initial:    { glyph: "ﺫ", hint: "Zal at word start looks identical to standalone — non-connector with dot above." },
     medial:     { glyph: "ﺬ", hint: "Zal in medial position looks like final — the dotted wedge attaches to the preceding letter." },
@@ -413,7 +425,7 @@ export const UrduLetters: UrduLetter[] = [
   },
   {
     name: "ain",
-    alternates: ["ayn", "a"],
+    alternates: ["ayn", "ein", "a"],
     standalone: { glyph: "ﻉ", hint: "Ain standalone: an open angular form like a backwards 'c' with a tail curling below." },
     initial:    { glyph: "ﻋ", hint: "Ain initial: opens wide to the right to connect, like a cupped hand." },
     medial:     { glyph: "ﻌ", hint: "Ain medial: a compressed angular form on the baseline, connecting on both sides." },
@@ -605,7 +617,7 @@ export const UrduLetters: UrduLetter[] = [
   },
   {
     name: "ye",
-    alternates: ["yay", "y"],
+    alternates: ["yay", "y", "yeh", "yee", "yi"],
     standalone: { glyph: "ﯼ", hint: "Ye (choti ye) standalone: two dots below a shallow curved form, like an upturned bowl." },
     initial:    { glyph: "ﯾ", hint: "Ye initial: a short tooth-like connecting stroke, two dots below." },
     medial:     { glyph: "ﯿ", hint: "Ye medial: tiny connecting tooth with two dots below." },

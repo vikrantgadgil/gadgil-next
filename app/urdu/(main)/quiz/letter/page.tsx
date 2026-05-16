@@ -177,6 +177,11 @@ export default function LetterQuizPage() {
               </button>
             </div>
 
+            {/* Instruction */}
+            <p className="rounded-xl bg-slate-100 px-4 py-2.5 text-sm text-slate-600">
+              Type the letter name in Roman Urdu (e.g. "dal", "ain", "qaf")
+            </p>
+
             {/* Hint toggle */}
             <div>
               <button
@@ -199,7 +204,7 @@ export default function LetterQuizPage() {
                 type="text"
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
-                placeholder="Type the letter name in Roman..."
+                placeholder='e.g. "dal", "ain", "qaf"'
                 disabled={inputDisabled}
                 autoFocus
                 className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm placeholder-slate-400 shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200 disabled:opacity-50"
