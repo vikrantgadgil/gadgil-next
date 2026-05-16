@@ -11,8 +11,10 @@ const TABS = [
   { href: "/urdu/ready-reckoner", label: "Ready Reckoner" },
   { href: "/urdu/quiz/letter", label: "Letter Quiz" },
   { href: "/urdu/quiz/word", label: "Word Quiz" },
+  { href: "/urdu/quiz/sentence", label: "Sentence Quiz" },
   { href: "/urdu/words", label: "My Words" },
 ] as const;
+
 
 export function UrduNav() {
   const path = usePathname();
