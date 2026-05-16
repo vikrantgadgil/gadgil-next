@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { urduQuizHistory } from "@/lib/db/schema";
-import { scoreSentence } from "@/lib/urdu/sentence-scoring";
+import { scoreSentenceWithAI } from "@/lib/urdu/ai-sentence-scoring";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -10,17 +10,25 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => null);
-  const { user_answer, sentence_id, words } = (body ?? {}) as {
+  const { user_answer, sentence_id, words, urdu_sentence, expected_roman } = (body ?? {}) as {
     user_answer?: string;
     sentence_id?: string;
     words?: { urdu: string; roman_primary: string; roman_accepted_variants: string[] }[];
+    urdu_sentence?: string;
+    expected_roman?: string;
   };
 
   if (!user_answer || !words || !sentence_id) {
     return Response.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  const result = scoreSentence(user_answer, words);
+  // Use AI as primary evaluator, fallback to local
+  const result = await scoreSentenceWithAI(
+    user_answer,
+    urdu_sentence ?? "",
+    expected_roman ?? words.map((w) => w.roman_primary).join(" "),
+    words
+  );
 
   // Log to quiz history
   await db.insert(urduQuizHistory).values({
@@ -40,5 +48,7 @@ export async function POST(request: Request) {
     normalizedExpected: result.normalizedExpected,
     normalizedUser: result.normalizedUser,
     feedback: result.feedback,
+    used_ai: result.used_ai,
+    ai_evaluation: result.ai_evaluation,
   });
 }

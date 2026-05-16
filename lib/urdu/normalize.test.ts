@@ -67,15 +67,52 @@ describe("normalizeRomanUrdu", () => {
     it("normalizes e/i equivalence", () => {
       expect(normalizeRomanUrdu("yee")).toBe("yi");
       expect(normalizeRomanUrdu("ye")).toBe("yi");
-      expect(normalizeRomanUrdu("yeh")).toBe("yih");
+      expect(normalizeRomanUrdu("yeh")).toBe("yi");
       expect(normalizeRomanUrdu("bey")).toBe("bi");
       expect(normalizeRomanUrdu("be")).toBe("bi");
     });
+
 
     it("removes apostrophes", () => {
       expect(normalizeRomanUrdu("qur'an")).toBe("kuran");
       expect(normalizeRomanUrdu("ma'mool")).toBe("mamul");
     });
+
+    it("mujhe accepts muzhe (j/z/zh tolerance)", () => {
+      expect(normalizeRomanUrdu("muzhe")).toBe("muji");
+      expect(normalizeRomanUrdu("mujhe")).toBe("muji");
+    });
+
+    it("mujhe accepts muje", () => {
+      expect(normalizeRomanUrdu("muje")).toBe("muji");
+    });
+
+    it("mujhe accepts mujhay/mujhey", () => {
+      expect(normalizeRomanUrdu("mujhay")).toBe("muji");
+      expect(normalizeRomanUrdu("mujhey")).toBe("muji");
+    });
+
+    it("mujhe accepts muzhay/muzhey", () => {
+      expect(normalizeRomanUrdu("muzhay")).toBe("muji");
+      expect(normalizeRomanUrdu("muzhey")).toBe("muji");
+    });
+
+    it("tujhe accepts tuzhe/tuje/tujhay/tujhey", () => {
+      expect(normalizeRomanUrdu("tuzhe")).toBe("tuji");
+      expect(normalizeRomanUrdu("tuje")).toBe("tuji");
+      expect(normalizeRomanUrdu("tujhay")).toBe("tuji");
+      expect(normalizeRomanUrdu("tujhey")).toBe("tuji");
+      expect(normalizeRomanUrdu("tuzhay")).toBe("tuji");
+      expect(normalizeRomanUrdu("tuzhey")).toBe("tuji");
+    });
+
+    it("ye accepts yeh, yee, yi", () => {
+      expect(normalizeRomanUrdu("ye")).toBe("yi");
+      expect(normalizeRomanUrdu("yeh")).toBe("yi");
+      expect(normalizeRomanUrdu("yee")).toBe("yi");
+      expect(normalizeRomanUrdu("yi")).toBe("yi");
+    });
+
   });
 
   describe("strict mode", () => {

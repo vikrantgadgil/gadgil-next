@@ -65,12 +65,25 @@ export function normalizeRomanUrduRelaxed(input: string): string {
   // Vowel length normalization
   s = s.replace(/ee/g, "i");
   s = s.replace(/oo/g, "u");
+  // ay/ey → i at word endings (common in Roman Urdu like mujhay/mujhey)
+  s = s.replace(/ay$/g, "i");
+  s = s.replace(/ey$/g, "i");
+
   // e/i equivalence (common in Roman Urdu letter names and words)
   s = s.replace(/e/g, "i");
-  // y at end of word often acts as vowel (e.g., bey → bi, bay → ba)
-  s = s.replace(/y$/g, "");
+
+  // y at end of word after consonant acts as vowel (e.g., bey → bi, bay → ba)
+  // But NOT after vowel (e.g., "ye" → "yi", not "")
+  s = s.replace(/([bcdfghjklmnpqrstvwxz])y$/g, "$1");
+
+  // h at end of word after e/i is often silent (e.g., yeh → ye, nah → na)
+  // But NOT after other vowels (e.g., "ruh" → keep the h)
+  s = s.replace(/([ei])h$/g, "$1");
+
+
   // ah → a at word end (e.g., maddah → madda)
   s = s.replace(/ah\b/g, "a");
+
 
   // x → kh
   s = s.replace(/x/g, "kh");
@@ -81,6 +94,13 @@ export function normalizeRomanUrduRelaxed(input: string): string {
   s = s.replace(/bh/g, "b");
   s = s.replace(/ph/g, "p");
   s = s.replace(/gh/g, "g");
+  s = s.replace(/jh/g, "j");
+
+  // j/z/zh tolerance for common Roman Urdu words (e.g., mujhe/muzhe)
+  // zh → j (common in Roman Urdu for the same sound as j)
+  s = s.replace(/zh/g, "j");
+
+
 
   // q → k (optional, common in relaxed Roman Urdu)
   s = s.replace(/q/g, "k");
